@@ -24,6 +24,7 @@ paging = "3.3.5"
 paging-compose = "3.3.5"
 navigation = "2.8.5"
 chucker = "4.0.0"
+playServicesAuth = "21.3.0"
 room = "2.7.0-alpha12"
 ksp = "2.1.0-1.0.29"
 googleGmsGoogleServices = "4.4.2"
@@ -79,6 +80,7 @@ room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
 room-runtime-android = { group = "androidx.room", name = "room-runtime-android", version.ref = "room" }
 firebase-auth = { group = "com.google.firebase", name = "firebase-auth", version.ref = "firebaseAuth" }
 firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore", version.ref = "firebaseFirestore" }
+play-services-auth = { module = "com.google.android.gms:play-services-auth", version.ref = "playServicesAuth" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
