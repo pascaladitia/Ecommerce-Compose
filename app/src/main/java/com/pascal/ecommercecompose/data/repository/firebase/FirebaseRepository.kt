@@ -1,6 +1,7 @@
 package com.pascal.ecommercecompose.data.repository.firebase
 
-import com.google.android.gms.auth.api.identity.SignInClient
+import android.content.Intent
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.pascal.ecommercecompose.domain.base.Resource
@@ -8,7 +9,7 @@ import kotlinx.coroutines.tasks.await
 
 class FirebaseRepository(
     private val auth: FirebaseAuth,
-    private val oneTapClient: SignInClient
+    private val googleSignInClient: GoogleSignInClient
 ) {
     fun isUserLoggedIn(): Boolean = auth.currentUser != null
 
@@ -40,9 +41,12 @@ class FirebaseRepository(
         }
     }
 
+    fun getSignInIntent(): Intent {
+        return googleSignInClient.signInIntent
+    }
+
     fun signOut() {
-        auth.signOut()
-        oneTapClient.signOut()
+        googleSignInClient.signOut()
     }
 }
 

@@ -3,20 +3,25 @@ package com.pascal.ecommercecompose.ui.navigation
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.pascal.ecommercecompose.data.prefs.PreferencesLogin
 import com.pascal.ecommercecompose.ui.screen.home.HomeScreen
 import com.pascal.ecommercecompose.ui.screen.live.LiveScreen
+import com.pascal.ecommercecompose.ui.screen.login.LoginScreen
 import com.pascal.ecommercecompose.ui.screen.profile.ProfileScreen
+import com.pascal.ecommercecompose.ui.screen.register.RegisterScreen
 import com.pascal.ecommercecompose.ui.screen.splash.SplashScreen
 
 @Composable
 fun RouteScreen(
     navController: NavHostController = rememberNavController(),
 ) {
+    val context = LocalContext.current
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
@@ -39,13 +44,41 @@ fun RouteScreen(
                 SplashScreen(
                     paddingValues = paddingValues
                 ) {
-                    navController.navigate( Screen.HomeScreen.route) {
+                    val isLogin = PreferencesLogin.getIsLogin(context)
+
+                    navController.navigate(
+                        if (isLogin) Screen.HomeScreen.route else Screen.LoginScreen.route
+                    ) {
                         popUpTo(Screen.SplashScreen.route) {
                             inclusive = true
                         }
                         launchSingleTop = true
                     }
                 }
+            }
+            composable(route = Screen.LoginScreen.route) {
+                LoginScreen(
+                    paddingValues = paddingValues,
+                    onLogin = {
+                        navController.navigate(Screen.HomeScreen.route) {
+                            popUpTo(Screen.LoginScreen.route) {
+                                inclusive = true
+                            }
+                            launchSingleTop = true
+                        }
+                    },
+                    onRegister = {
+                        navController.navigate(Screen.RegisterScreen.route)
+                    }
+                )
+            }
+            composable(route = Screen.RegisterScreen.route) {
+                RegisterScreen(
+                    paddingValues = paddingValues,
+                    onNavBack = {
+                        navController.popBackStack()
+                    }
+                )
             }
             composable(route = Screen.HomeScreen.route) {
                 HomeScreen(
