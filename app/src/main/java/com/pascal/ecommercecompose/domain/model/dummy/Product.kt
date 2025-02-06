@@ -9,4 +9,5 @@ data class Product(
     val isliked: Int,
     val imageID: Int,
     val category: String,
+    val description: String
 ) : Serializable

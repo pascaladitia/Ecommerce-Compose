@@ -56,7 +56,7 @@ fun Search(
         onValueChange = {
             searchText = it
         },
-        textStyle = MaterialTheme.typography.bodySmall,
+        textStyle = MaterialTheme.typography.bodyMedium,
         singleLine = true,
         keyboardOptions = KeyboardOptions.Default.copy(
             imeAction = ImeAction.Search,
@@ -91,7 +91,7 @@ fun Search(
                         if (searchText.isEmpty()) {
                             Text(
                                 text = "Search Products",
-                                style = MaterialTheme.typography.bodySmall.copy(
+                                style = MaterialTheme.typography.bodyMedium.copy(
                                     color = MaterialTheme.colorScheme.onSurface
                                 )
                             )
