@@ -38,7 +38,7 @@ object DataDummy {
             "Nike Air Max 95",
             160.00,
             100,
-            R.drawable.shoe_tilt_3,
+            R.drawable.shoe_tilt_4,
             "Trending Now",
             description = "At first, the latest Air Max design hit resistance within Nike. It was unusual looking and featured the first-ever visible forefoot Air. Some loved the black midsole — the first time it was ever used in Nike running footwear — while others hated it. Which to designer Sergio Lozano, meant he was on to something."
         )

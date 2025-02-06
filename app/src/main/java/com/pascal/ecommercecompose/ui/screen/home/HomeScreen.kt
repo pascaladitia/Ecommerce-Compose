@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -52,6 +53,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.pascal.ecommercecompose.R
+import com.pascal.ecommercecompose.domain.model.dummy.DataDummy.productList
+import com.pascal.ecommercecompose.domain.model.dummy.Product
 import com.pascal.ecommercecompose.ui.component.form.Search
 import com.pascal.ecommercecompose.ui.theme.AppTheme
 import com.pascal.ecommercecompose.ui.theme.lightGrey
@@ -67,14 +70,14 @@ fun HomeScreen(
     modifier: Modifier = Modifier,
     paddingValues: PaddingValues,
     viewModel: HomeViewModel = koinViewModel(),
-    onDetail: () -> Unit
+    onDetail: (Product) -> Unit
 ) {
     Surface(
         modifier = modifier.padding(paddingValues),
         color = MaterialTheme.colorScheme.background
     ) {
-        HomeContent() {
-            onDetail()
+        HomeContent {
+            onDetail(it)
         }
     }
 }
@@ -82,7 +85,7 @@ fun HomeScreen(
 @Composable
 fun HomeContent(
     modifier: Modifier = Modifier,
-    onDetail: () -> Unit
+    onDetail: (Product) -> Unit
 ) {
     Box(
         modifier = modifier
@@ -97,7 +100,7 @@ fun HomeContent(
             ProductCategory()
             Spacer(modifier = Modifier.padding(20.dp))
             ProductWidget() {
-                onDetail()
+                onDetail(it)
             }
         }
     }
@@ -273,16 +276,9 @@ fun ProductCategory() {
 @Composable
 fun ProductWidget(
     modifier: Modifier = Modifier,
-    onDetail: () -> Unit
+    onDetail: (Product) -> Unit
 ) {
-    val productImagesList = listOf<Int>(
-        R.drawable.shooe_tilt_1,
-        R.drawable.shoe_tilt_2,
-    )
-    val productTitleitemList = listOf("Nike Air Max 200", "Nike Air Max 97")
-    val productTrendingitemList = listOf("Trending Now", "Best Selling")
-    val productPriceitemList = listOf("240.00", "220.00")
-    val productPriceTagitemList = listOf("$ ", "$ ")
+    val productList = productList
 
     LazyRow(
         modifier = modifier
@@ -291,7 +287,7 @@ fun ProductWidget(
         contentPadding = PaddingValues(horizontal = 5.dp),
         horizontalArrangement = Arrangement.spacedBy(20.dp)
     ) {
-        items(productImagesList.size) { item ->
+        items(productList) { item ->
             Card(
                 modifier = Modifier
                     .width(180.dp)
@@ -304,7 +300,7 @@ fun ProductWidget(
                 Column(
                     modifier = Modifier
                         .clip(RoundedCornerShape(24.dp))
-                        .clickable { onDetail() }
+                        .clickable { onDetail(item) }
                         .fillMaxWidth()
                         .wrapContentHeight()
                         .padding(12.dp)
@@ -329,7 +325,7 @@ fun ProductWidget(
                         Image(
                             modifier = Modifier
                                 .size(100.dp),
-                            painter = painterResource(productImagesList[item]),
+                            painter = painterResource(item.imageID),
                             contentDescription = "",
                         )
                     }
@@ -343,14 +339,14 @@ fun ProductWidget(
                     ) {
 
                         Text(
-                            text = productTitleitemList[item],
+                            text = item.name,
                             fontWeight = FontWeight.Bold,
                             fontSize = 16.sp,
                             color = titleTextColor
                         )
 
                         Text(
-                            text = productTrendingitemList[item],
+                            text = item.category,
                             fontWeight = FontWeight.Bold,
                             fontSize = 16.sp,
                             color = orange,
@@ -365,14 +361,14 @@ fun ProductWidget(
                                         fontWeight = FontWeight.Bold
                                     )
                                 ) {
-                                    append(productPriceTagitemList[item])
+                                    append("$")
                                 }
                                 withStyle(
                                     style = SpanStyle(
                                         titleTextColor
                                     )
                                 ) {
-                                    append(productPriceitemList[item])
+                                    append(item.price.toString())
                                 }
                             },
                             style = MaterialTheme.typography.bodySmall,
