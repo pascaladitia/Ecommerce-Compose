@@ -131,15 +131,21 @@ fun analyzeImage(
         .addOnSuccessListener { faces ->
             if (faces.isNotEmpty()) {
                 val face = faces.first()
-                val smileDetected = (face.smilingProbability ?: 0f) > 0.5f
+                val smileProbability = face.smilingProbability ?: 0f
+                Log.d("SmileDetection", "Senyum terdeteksi: $smileProbability")
+                val smileDetected = smileProbability > 0.3f
                 onSmileDetected(smileDetected)
+            } else {
+                Log.d("SmileDetection", "Tidak ada wajah yang terdeteksi")
             }
             imageProxy.close()
         }
         .addOnFailureListener { exception ->
-            Log.e("FaceDetection", "Face detection failed", exception)
+            Log.e("SmileDetection", "Deteksi wajah gagal", exception)
             imageProxy.close()
         }
+
+
 }
 
 @Preview(showBackground = true)

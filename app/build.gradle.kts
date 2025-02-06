@@ -160,7 +160,7 @@ dependencies {
     implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore)
     implementation(libs.play.services.auth)
-    implementation("com.google.mlkit:face-detection:16.1.7")
+    implementation("com.google.mlkit:face-detection:16.0.7")
 
     // Camera
     implementation("androidx.camera:camera-camera2:1.4.1")
