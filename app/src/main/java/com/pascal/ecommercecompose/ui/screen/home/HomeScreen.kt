@@ -97,7 +97,7 @@ fun HomeContent(
             ProductCategory()
             Spacer(modifier = Modifier.padding(20.dp))
             ProductWidget() {
-
+                onDetail()
             }
         }
     }

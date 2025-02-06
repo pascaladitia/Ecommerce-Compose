@@ -9,6 +9,7 @@ import com.pascal.ecommercecompose.data.local.database.AppDatabase
 import com.pascal.ecommercecompose.data.local.repository.LocalRepository
 import com.pascal.ecommercecompose.data.repository.Repository
 import com.pascal.ecommercecompose.data.repository.firebase.FirebaseRepository
+import com.pascal.ecommercecompose.ui.screen.detail.DetailViewModel
 import com.pascal.ecommercecompose.ui.screen.home.HomeViewModel
 import com.pascal.ecommercecompose.ui.screen.live.CartViewModel
 import com.pascal.ecommercecompose.ui.screen.login.LoginViewModel
@@ -50,4 +51,5 @@ val appModule = module {
     singleOf(::HomeViewModel)
     singleOf(::CartViewModel)
     singleOf(::ProfileViewModel)
+    singleOf(::DetailViewModel)
 }

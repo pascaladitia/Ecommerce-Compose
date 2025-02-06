@@ -16,14 +16,18 @@ import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.pascal.ecommercecompose.ui.theme.orange
 
 
 @Composable
-fun TopAppBarWithBack(onBackClick: () -> Unit) {
+fun TopAppBarWithBack(
+    modifier: Modifier = Modifier,
+    onBackClick: () -> Unit
+) {
     Row(
-        modifier = Modifier.fillMaxWidth()
+        modifier = modifier.fillMaxWidth()
             .padding(30.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.Top
@@ -31,7 +35,8 @@ fun TopAppBarWithBack(onBackClick: () -> Unit) {
         Card(
             modifier = Modifier.width(50.dp),
             shape = RoundedCornerShape(12.dp),
-            elevation = CardDefaults.cardElevation(6.dp)
+            elevation = CardDefaults.cardElevation(6.dp),
+            colors =  CardDefaults.cardColors(Color.White)
         ) {
             IconButton(onClick = { onBackClick() }) {
                 Icon(
@@ -45,7 +50,8 @@ fun TopAppBarWithBack(onBackClick: () -> Unit) {
         Card(
             modifier = Modifier.width(50.dp),
             shape = RoundedCornerShape(12.dp),
-            elevation = CardDefaults.cardElevation(6.dp)
+            elevation = CardDefaults.cardElevation(6.dp),
+            colors =  CardDefaults.cardColors(Color.White)
         ) {
             IconButton(onClick = { }) {
                 Icon(
