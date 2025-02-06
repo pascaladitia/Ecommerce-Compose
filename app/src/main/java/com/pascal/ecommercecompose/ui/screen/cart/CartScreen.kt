@@ -51,6 +51,7 @@ import com.pascal.ecommercecompose.ui.theme.orange
 import com.pascal.ecommercecompose.ui.theme.subTitleTextColor
 import com.pascal.ecommercecompose.ui.theme.titleTextColor
 import com.pascal.ecommercecompose.ui.theme.white
+import kotlinx.coroutines.launch
 
 @Composable
 fun CartScreen(
@@ -73,7 +74,16 @@ fun CartScreen(
     ) {
         CartContent(
             product = uiState.product,
-            uiEvent = CartUIEvent()
+            uiEvent = CartUIEvent(
+                onDelete = {
+                    coroutine.launch {
+                        viewModel.deleteCart()
+                    }
+                },
+                onNext = {
+                    
+                }
+            )
         )
     }
 }
@@ -95,7 +105,7 @@ fun CartContent(
         ) {
             TopAppBarHeader()
             Spacer(modifier = Modifier.padding(5.dp))
-            DeleteCart()
+            DeleteCart(uiEvent = uiEvent)
             Spacer(modifier = Modifier.padding(20.dp))
             CartItemList(
                 product = product,
@@ -112,9 +122,12 @@ fun CartContent(
 
 
 @Composable
-fun DeleteCart() {
+fun DeleteCart(
+    modifier: Modifier = Modifier,
+    uiEvent: CartUIEvent
+) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -143,7 +156,7 @@ fun DeleteCart() {
             }
         )
 
-        IconButton(onClick = { }) {
+        IconButton(onClick = { uiEvent.onDelete() }) {
             Icon(
                 imageVector = Icons.Outlined.Delete,
                 contentDescription = "",

@@ -20,4 +20,7 @@ interface ProductDao {
 
     @Delete
     suspend fun deleteProduct(entity: ProductEntity)
+
+    @Query("DELETE FROM Product")
+    suspend fun clearProduct()
 }

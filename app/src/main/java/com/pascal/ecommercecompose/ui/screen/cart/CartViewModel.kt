@@ -38,4 +38,27 @@ class CartViewModel(
         }
     }
 
+    suspend fun deleteCart() {
+        _uiState.update { it.copy(isLoading = true) }
+
+        try {
+            database.deleteProduct()
+
+            _uiState.update {
+                it.copy(
+                    isLoading = false,
+                    product = emptyList()
+                )
+            }
+        } catch (e: Exception) {
+            _uiState.update {
+                it.copy(
+                    isLoading = false,
+                    isError = true,
+                    message = e.message.toString()
+                )
+            }
+        }
+    }
+
 }

@@ -40,6 +40,10 @@ class LocalRepository(
         return database.productDao().deleteProduct(item)
     }
 
+    override suspend fun deleteProduct() {
+        return database.productDao().clearProduct()
+    }
+
     override suspend fun insertProduct(item: ProductEntity) {
         return database.productDao().insertProduct(item)
     }

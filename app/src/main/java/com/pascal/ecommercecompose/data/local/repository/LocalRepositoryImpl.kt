@@ -13,5 +13,6 @@ interface LocalRepositoryImpl {
     suspend fun getProductById(id: Long): ProductEntity?
     suspend fun getAllProducts(): List<ProductEntity>
     suspend fun deleteProductById(item: ProductEntity)
+    suspend fun deleteProduct()
     suspend fun insertProduct(item: ProductEntity)
 }
