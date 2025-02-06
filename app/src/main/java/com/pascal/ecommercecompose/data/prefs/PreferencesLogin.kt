@@ -2,6 +2,7 @@ package com.pascal.ecommercecompose.data.prefs
 
 import android.content.Context
 import androidx.core.content.edit
+import com.pascal.ecommercecompose.domain.model.user.User
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
@@ -11,7 +12,7 @@ object PreferencesLogin {
     private const val IS_LOGIN = "isLogin"
     private const val RESPONSE_LOGIN = "response_login"
 
-    fun setLoginResponse(context: Context, value: String?) {
+    fun setLoginResponse(context: Context, value: User?) {
         val jsonString = Json.encodeToString(value)
         val sharedPreferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         sharedPreferences.edit {
@@ -20,7 +21,7 @@ object PreferencesLogin {
         }
     }
 
-    fun getLoginResponse(context: Context): String? {
+    fun getLoginResponse(context: Context): User? {
         val sharedPreferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         val jsonString =  sharedPreferences.getString(RESPONSE_LOGIN, "")
         return jsonString.let { Json.decodeFromString(it ?: "") }

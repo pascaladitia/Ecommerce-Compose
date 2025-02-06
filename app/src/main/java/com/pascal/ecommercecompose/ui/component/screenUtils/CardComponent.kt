@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -28,10 +29,11 @@ fun CardComponent(
             .clip(RoundedCornerShape(radius))
             .border(1.dp, LightGray, RoundedCornerShape(radius))
             .background(Color.White)
-            .padding(padding)
+            .padding(padding),
     ) {
         Column(
             modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             content()
         }

@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -35,6 +37,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.pascal.ecommercecompose.R
 import com.pascal.ecommercecompose.data.local.entity.ProductEntity
+import com.pascal.ecommercecompose.data.prefs.PreferencesLogin
 import com.pascal.ecommercecompose.ui.component.button.ButtonComponent
 import com.pascal.ecommercecompose.ui.component.screenUtils.CardComponent
 import com.pascal.ecommercecompose.ui.screen.cart.CartViewModel
@@ -73,6 +76,9 @@ fun ReportContent(
     onDownload: (List<ProductEntity>?) -> Unit = {},
     onNavBack: () -> Unit = {}
 ) {
+    val context = LocalContext.current
+    val pref = PreferencesLogin.getLoginResponse(context)
+
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -111,6 +117,14 @@ fun ReportContent(
                 contentDescription = null
             )
 
+            Spacer(Modifier.height(16.dp))
+
+            Text(
+                text = "Report Transaction",
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.primary
+            )
+
             Spacer(Modifier.height(24.dp))
 
             Text(
@@ -122,10 +136,51 @@ fun ReportContent(
             Spacer(Modifier.height(16.dp))
 
             ReportItemText(
-                title = "Nama Tertanggung",
-                value = "product?.namaNasabah" ?: "-"
+                title = "Name",
+                value = pref?.name ?: "No Name"
             )
 
+            ReportItemText(
+                title = "Email",
+                value = pref?.email ?: "Email"
+            )
+
+            Spacer(Modifier.height(24.dp))
+
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = "Transaction",
+                style = MaterialTheme.typography.titleSmall
+            )
+
+            Spacer(Modifier.height(16.dp))
+
+            LazyColumn(
+                modifier = modifier
+                    .fillMaxWidth()
+                    .height(400.dp),
+                contentPadding = PaddingValues(horizontal = 5.dp),
+                verticalArrangement = Arrangement.spacedBy(40.dp)
+            ) {
+                items(product ?: emptyList()) {
+                    ReportItemText(
+                        title = "Product name",
+                        value = it.name
+                    )
+
+                    ReportItemText(
+                        title = "Quantity",
+                        value = it.qty.toString()
+                    )
+                }
+            }
+
+            Spacer(Modifier.height(16.dp))
+
+            ReportItemText(
+                title = "Total Amount",
+                value = "${product!!.sumOf { it.price * it.qty }}"
+            )
 
             Spacer(Modifier.width(32.dp))
 
@@ -180,7 +235,7 @@ fun ReportItemText(
     }
 }
 
-@Preview
+@Preview(showSystemUi = true)
 @Composable
 private fun ReportPreview() {
     AppTheme {

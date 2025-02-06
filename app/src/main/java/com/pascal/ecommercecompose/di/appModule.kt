@@ -9,13 +9,12 @@ import com.pascal.ecommercecompose.data.local.database.AppDatabase
 import com.pascal.ecommercecompose.data.local.repository.LocalRepository
 import com.pascal.ecommercecompose.data.repository.Repository
 import com.pascal.ecommercecompose.data.repository.firebase.FirebaseRepository
+import com.pascal.ecommercecompose.ui.screen.cart.CartViewModel
 import com.pascal.ecommercecompose.ui.screen.detail.DetailViewModel
 import com.pascal.ecommercecompose.ui.screen.home.HomeViewModel
-import com.pascal.ecommercecompose.ui.screen.cart.CartViewModel
 import com.pascal.ecommercecompose.ui.screen.login.LoginViewModel
 import com.pascal.ecommercecompose.ui.screen.profile.ProfileViewModel
 import com.pascal.ecommercecompose.ui.screen.register.RegisterViewModel
-import com.pascal.ecommercecompose.ui.viewModel.MainViewModel
 import com.pascal.ecommercecompose.utils.Constant
 import kotlinx.coroutines.Dispatchers
 import org.koin.android.ext.koin.androidContext
@@ -47,7 +46,6 @@ val appModule = module {
 
     singleOf(::LoginViewModel)
     singleOf(::RegisterViewModel)
-    singleOf(::MainViewModel)
     singleOf(::HomeViewModel)
     singleOf(::CartViewModel)
     singleOf(::ProfileViewModel)

@@ -1,11 +1,11 @@
 package com.pascal.ecommercecompose.ui.screen.login
 
 import android.content.Context
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.pascal.ecommercecompose.data.prefs.PreferencesLogin
 import com.pascal.ecommercecompose.data.repository.firebase.FirebaseRepository
 import com.pascal.ecommercecompose.domain.base.Resource
+import com.pascal.ecommercecompose.domain.model.user.User
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -23,8 +23,13 @@ class LoginViewModel(
         when (val result = firebaseAuthRepository.signIn(email, password)) {
             is Resource.Success -> {
 
+                val user = User(
+                    id = result.data,
+                    name = "",
+                    email = email
+                )
                 PreferencesLogin.setIsLogin(context, true)
-                PreferencesLogin.setLoginResponse(context, result.data)
+                PreferencesLogin.setLoginResponse(context, user)
 
                 _uiState.update {
                     it.copy(
@@ -54,8 +59,14 @@ class LoginViewModel(
         when (val result = firebaseAuthRepository.signInWithGoogle(idToken)) {
             is Resource.Success -> {
 
+                val user = User(
+                    id = result.data?.uid ?: "",
+                    name = result.data?.displayName ?: "",
+                    email = result.data?.email ?: "",
+                    photo_url = result.data?.photoUrl.toString()
+                )
                 PreferencesLogin.setIsLogin(context, true)
-                PreferencesLogin.setLoginResponse(context, result.data)
+                PreferencesLogin.setLoginResponse(context, user)
 
                 _uiState.update {
                     it.copy(

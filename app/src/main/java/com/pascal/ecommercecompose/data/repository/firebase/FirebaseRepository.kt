@@ -3,6 +3,7 @@ package com.pascal.ecommercecompose.data.repository.firebase
 import android.content.Intent
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import com.pascal.ecommercecompose.domain.base.Resource
 import kotlinx.coroutines.tasks.await
@@ -31,11 +32,11 @@ class FirebaseRepository(
         }
     }
 
-    suspend fun signInWithGoogle(idToken: String): Resource<String> {
+    suspend fun signInWithGoogle(idToken: String): Resource<FirebaseUser?> {
         return try {
             val credential = GoogleAuthProvider.getCredential(idToken, null)
             val result = auth.signInWithCredential(credential).await()
-            Resource.Success(result.user?.uid.orEmpty())
+            Resource.Success(result.user)
         } catch (e: Exception) {
             Resource.Error(e)
         }
