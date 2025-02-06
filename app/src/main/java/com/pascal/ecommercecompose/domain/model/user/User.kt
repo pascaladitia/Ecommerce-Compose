@@ -8,5 +8,5 @@ data class User(
     val name: String,
     val email: String,
     val photo_url: String = "",
-    val isVerified: Boolean = false
+    var isVerified: Boolean = false
 ) : Serializable

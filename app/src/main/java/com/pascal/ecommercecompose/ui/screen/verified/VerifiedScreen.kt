@@ -13,11 +13,7 @@ import androidx.camera.view.PreviewView
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -28,7 +24,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
@@ -36,6 +31,7 @@ import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.face.FaceDetection
 import com.google.mlkit.vision.face.FaceDetector
 import com.google.mlkit.vision.face.FaceDetectorOptions
+import com.pascal.ecommercecompose.data.prefs.PreferencesLogin
 import com.pascal.ecommercecompose.ui.theme.AppTheme
 
 @Composable
@@ -43,6 +39,8 @@ fun VerifiedScreen(
     modifier: Modifier = Modifier,
     onNavBack: () -> Unit
 ) {
+    val context = LocalContext.current
+    val pref = PreferencesLogin.getLoginResponse(context)
     var detectedSmile by remember { mutableStateOf(false) }
 
     Column(
@@ -52,6 +50,9 @@ fun VerifiedScreen(
     ) {
         if (detectedSmile) {
             Toast.makeText(LocalContext.current, "Deteksi Senyum Berhasil!", Toast.LENGTH_SHORT).show()
+
+            PreferencesLogin.setLoginResponse(context, pref?.apply { isVerified = true })
+            onNavBack()
         }
 
         Box(modifier = Modifier.fillMaxSize()) {
@@ -70,6 +71,8 @@ fun CameraPreview(context: Context, onSmileDetected: (Boolean) -> Unit) {
                 .setPerformanceMode(FaceDetectorOptions.PERFORMANCE_MODE_FAST)
                 .setLandmarkMode(FaceDetectorOptions.LANDMARK_MODE_ALL)
                 .setContourMode(FaceDetectorOptions.CONTOUR_MODE_NONE)
+                .setClassificationMode(FaceDetectorOptions.CLASSIFICATION_MODE_ALL)
+                .setMinFaceSize(0.1f)
                 .build()
         )
     }
