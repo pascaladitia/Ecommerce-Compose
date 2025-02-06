@@ -25,7 +25,7 @@ class LoginViewModel(
 
                 val user = User(
                     id = result.data,
-                    name = "",
+                    name = "No Name",
                     email = email
                 )
                 PreferencesLogin.setIsLogin(context, true)

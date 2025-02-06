@@ -43,6 +43,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.ParagraphStyle
 import androidx.compose.ui.text.SpanStyle
@@ -52,7 +54,11 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.net.toUri
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 import com.pascal.ecommercecompose.R
+import com.pascal.ecommercecompose.data.prefs.PreferencesLogin
 import com.pascal.ecommercecompose.domain.model.dummy.DataDummy.productList
 import com.pascal.ecommercecompose.domain.model.dummy.Product
 import com.pascal.ecommercecompose.ui.component.form.Search
@@ -108,6 +114,9 @@ fun HomeContent(
 
 @Composable
 fun TopAppBarHeader() {
+    val context = LocalContext.current
+    val pref = PreferencesLogin.getLoginResponse(context)
+
     Row(
         modifier = Modifier
             .fillMaxWidth(),
@@ -138,8 +147,18 @@ fun TopAppBarHeader() {
             colors =  CardDefaults.cardColors(Color.White)
         ) {
             Image(
-                painter = painterResource(id = R.drawable.user), contentDescription = "User",
-                modifier = Modifier.size(50.dp)
+                painter = rememberAsyncImagePainter(
+                    ImageRequest.Builder(LocalContext.current)
+                        .data(data = pref?.photo_url?.toUri())
+                        .error(R.drawable.no_profile)
+                        .apply { crossfade(true) }
+                        .build()
+                ),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .size(60.dp)
+                    .background(MaterialTheme.colorScheme.background, CircleShape)
             )
         }
 

@@ -106,8 +106,14 @@ fun RouteScreen(
             composable(route = Screen.ProfileScreen.route) {
                 ProfileScreen(
                     paddingValues = paddingValues,
-                    onDetail = {
+                    onLogout = {
                         navController.popBackStack()
+                        navController.navigate(Screen.LoginScreen.route) {
+                            popUpTo(Screen.HomeScreen.route) {
+                                inclusive = true
+                            }
+                            launchSingleTop = true
+                        }
                     }
                 )
             }
