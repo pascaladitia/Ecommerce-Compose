@@ -19,6 +19,7 @@ import com.pascal.ecommercecompose.ui.screen.profile.ProfileScreen
 import com.pascal.ecommercecompose.ui.screen.register.RegisterScreen
 import com.pascal.ecommercecompose.ui.screen.report.ReportScreen
 import com.pascal.ecommercecompose.ui.screen.splash.SplashScreen
+import com.pascal.ecommercecompose.ui.screen.verified.VerifiedScreen
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
@@ -106,6 +107,9 @@ fun RouteScreen(
             composable(route = Screen.ProfileScreen.route) {
                 ProfileScreen(
                     paddingValues = paddingValues,
+                    onVerified = {
+                        navController.navigate(Screen.VerifiedScreen.route)
+                    },
                     onLogout = {
                         navController.popBackStack()
                         navController.navigate(Screen.LoginScreen.route) {
@@ -134,6 +138,14 @@ fun RouteScreen(
                     onNavBack = {
                         navController.popBackStack()
                         navController.navigate(Screen.HomeScreen.route)
+                    }
+                )
+            }
+            composable(route = Screen.VerifiedScreen.route) {
+                VerifiedScreen(
+                    onNavBack = {
+                        navController.popBackStack()
+                        navController.navigate(Screen.ProfileScreen.route)
                     }
                 )
             }
