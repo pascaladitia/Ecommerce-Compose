@@ -4,6 +4,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -17,6 +18,8 @@ import com.pascal.ecommercecompose.ui.screen.login.LoginScreen
 import com.pascal.ecommercecompose.ui.screen.profile.ProfileScreen
 import com.pascal.ecommercecompose.ui.screen.register.RegisterScreen
 import com.pascal.ecommercecompose.ui.screen.splash.SplashScreen
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 @Composable
 fun RouteScreen(
@@ -85,6 +88,7 @@ fun RouteScreen(
                 HomeScreen(
                     paddingValues = paddingValues,
                     onDetail = {
+                        saveToCurrentBackStack(navController, "item", it)
                         navController.navigate(Screen.DetailScreen.route)
                     }
                 )
@@ -108,11 +112,31 @@ fun RouteScreen(
             composable(route = Screen.DetailScreen.route) {
                 DetailScreen(
                     paddingValues = paddingValues,
+                    product = getFromPreviousBackStack(navController, "item"),
                     onNavBack = {
-                        navController.popBackStack()
+                        navController.navigateUp()
                     }
                 )
             }
         }
     }
 }
+
+inline fun <reified T> saveToCurrentBackStack(
+    navController: NavController,
+    key: String,
+    data: T
+) {
+    val json = Json.encodeToString(data)
+    navController.currentBackStackEntry?.savedStateHandle?.set(key, json)
+}
+
+inline fun <reified T> getFromPreviousBackStack(
+    navController: NavController,
+    key: String
+): T? {
+    val json = navController.previousBackStackEntry?.savedStateHandle?.get<String>(key)
+    return json?.let { Json.decodeFromString(it) }
+}
+
+

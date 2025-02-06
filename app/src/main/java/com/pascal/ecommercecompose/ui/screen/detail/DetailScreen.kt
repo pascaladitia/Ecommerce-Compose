@@ -51,6 +51,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import com.pascal.ecommercecompose.R
+import com.pascal.ecommercecompose.domain.model.dummy.Product
 import com.pascal.ecommercecompose.ui.component.screenUtils.TopAppBarWithBack
 import com.pascal.ecommercecompose.ui.theme.AppTheme
 import com.pascal.ecommercecompose.ui.theme.black
@@ -70,6 +71,7 @@ import org.koin.androidx.compose.koinViewModel
 fun DetailScreen(
     modifier: Modifier = Modifier,
     paddingValues: PaddingValues,
+    product: Product? = null,
     viewModel: DetailViewModel = koinViewModel(),
     onNavBack: () -> Unit
 ) {
@@ -77,7 +79,9 @@ fun DetailScreen(
         modifier = modifier.padding(paddingValues),
         color = MaterialTheme.colorScheme.background
     ) {
-        DetailContent() {
+        DetailContent(
+            product = product
+        ) {
             onNavBack()
         }
     }
@@ -87,9 +91,11 @@ fun DetailScreen(
 @Composable
 fun DetailContent(
     modifier: Modifier = Modifier,
+    product: Product? = null,
     onNavBack: () -> Unit
 ) {
     Scaffold(
+        modifier = modifier,
         topBar = {
             TopAppBarWithBack(
                 onBackClick = {
@@ -117,7 +123,9 @@ fun DetailContent(
                     .fillMaxSize()
                     .verticalScroll(rememberScrollState())
             ) {
-                ConstraintLayout {
+                ConstraintLayout(
+                    modifier = Modifier.fillMaxSize()
+                ) {
                     val (imagesliderref, addtocartref) = createRefs()
                     Box(modifier = Modifier
                         .height(280.dp)
@@ -127,7 +135,7 @@ fun DetailContent(
                             start.linkTo(parent.start)
                             end.linkTo(parent.end)
                         }) {
-                        HeaderImagesSlider()
+                        HeaderImagesSlider(product)
                     }
                     Surface(
                         color = white,
@@ -150,11 +158,11 @@ fun DetailContent(
                                 .fillMaxSize()
                                 .padding(30.dp)
                         ) {
-                            ProductTitle()
+                            ProductTitle(product)
                             Spacer(modifier = Modifier.padding(10.dp))
                             ProductAvailableSize()
                             Spacer(modifier = Modifier.padding(10.dp))
-                            ProductItemColorWithDesc()
+                            ProductItemColorWithDesc(product)
                         }
 
 
@@ -170,7 +178,9 @@ fun DetailContent(
 
 
 @Composable
-fun HeaderImagesSlider() {
+fun HeaderImagesSlider(
+    product: Product? = null
+) {
     val showThumbImagesList = listOf<Int>(
         R.drawable.show_1,
         R.drawable.shoe_thumb_1,
@@ -186,7 +196,7 @@ fun HeaderImagesSlider() {
     ) {
         Image(
             contentScale = ContentScale.Fit,
-            painter = painterResource(id = R.drawable.show_1),
+            painter = painterResource(id = product?.imageID ?: R.drawable.logo),
             contentDescription = "",
             modifier = Modifier
                 .size(230.dp)
@@ -230,7 +240,7 @@ fun HeaderImagesSlider() {
 }
 
 @Composable
-fun ProductTitle() {
+fun ProductTitle(product: Product?) {
     Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -249,7 +259,7 @@ fun ProductTitle() {
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                text = "NIKE AIR MAX 200",
+                text = product?.name ?: "",
                 color = titleTextColor,
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold
@@ -271,7 +281,7 @@ fun ProductTitle() {
                                 titleTextColor
                             )
                         ) {
-                            append("240")
+                            append(product?.price.toString())
                         }
                     },
                     style = MaterialTheme.typography.bodySmall,
@@ -335,7 +345,7 @@ fun ProductAvailableSize() {
 }
 
 @Composable
-fun ProductItemColorWithDesc() {
+fun ProductItemColorWithDesc(product: Product?) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
             text = "Color",
@@ -394,7 +404,7 @@ fun ProductItemColorWithDesc() {
         )
         Spacer(modifier = Modifier.padding(5.dp))
         Text(
-            text = stringResource(id = R.string.product_text_description),
+            text = product?.description ?: "",
             color = lightblack,
             fontSize = 14.sp
         )
