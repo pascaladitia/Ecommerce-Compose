@@ -1,7 +1,9 @@
 package com.pascal.ecommercecompose.ui.screen.login
 
+import android.content.Context
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import com.pascal.ecommercecompose.data.prefs.PreferencesLogin
 import com.pascal.ecommercecompose.data.repository.firebase.FirebaseRepository
 import com.pascal.ecommercecompose.domain.base.Resource
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,11 +17,15 @@ class LoginViewModel(
     private val _uiState = MutableStateFlow(LoginUIState())
     val uiState get() = _uiState.asStateFlow()
 
-    suspend fun loadLogin(email: String, password: String) {
+    suspend fun loadLogin(context: Context, email: String, password: String) {
         _uiState.update { it.copy(isLoading = true) }
 
         when (val result = firebaseAuthRepository.signIn(email, password)) {
             is Resource.Success -> {
+
+                PreferencesLogin.setIsLogin(context, true)
+                PreferencesLogin.setLoginResponse(context, result.data)
+
                 _uiState.update {
                     it.copy(
                         isLoading = false,
@@ -42,15 +48,15 @@ class LoginViewModel(
 
     fun onGoogleSignInIntent() = firebaseAuthRepository.getSignInIntent()
 
-    suspend fun loadGoogle(idToken: String) {
+    suspend fun loadGoogle(context: Context, idToken: String) {
         _uiState.update { it.copy(isLoading = true) }
-
-        Log.e("Tag success", idToken)
-
 
         when (val result = firebaseAuthRepository.signInWithGoogle(idToken)) {
             is Resource.Success -> {
-                Log.e("Tag success", result.data)
+
+                PreferencesLogin.setIsLogin(context, true)
+                PreferencesLogin.setLoginResponse(context, result.data)
+
                 _uiState.update {
                     it.copy(
                         isLoading = false,

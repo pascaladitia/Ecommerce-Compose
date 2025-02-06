@@ -87,6 +87,7 @@ fun RegisterScreen(
     var isContentVisible by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
+        delay(200)
         isContentVisible = true
     }
 
@@ -166,7 +167,7 @@ fun RegisterContent(
                 }
         ) {
             Image(
-                painter = painterResource(id = R.drawable.bgg_blue),
+                painter = painterResource(id = R.drawable.bgg_orange),
                 contentDescription = null,
                 contentScale = ContentScale.FillBounds,
                 modifier = Modifier

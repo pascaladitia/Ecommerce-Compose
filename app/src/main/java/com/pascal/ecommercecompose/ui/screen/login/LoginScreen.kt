@@ -2,7 +2,6 @@ package com.pascal.ecommercecompose.ui.screen.login
 
 import android.Manifest
 import android.os.Build
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -80,6 +79,7 @@ import com.pascal.ecommercecompose.ui.component.form.FormPasswordComponent
 import com.pascal.ecommercecompose.ui.component.screenUtils.LoadingScreen
 import com.pascal.ecommercecompose.ui.theme.AppTheme
 import com.pascal.ecommercecompose.utils.showToast
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
@@ -124,18 +124,14 @@ fun LoginScreen(
         contract = ActivityResultContracts.StartActivityForResult()
     ) { result ->
         try {
-            val account: GoogleSignInAccount? =
-                GoogleSignIn.getSignedInAccountFromIntent(result.data).result
+            val account: GoogleSignInAccount? = GoogleSignIn.getSignedInAccountFromIntent(result.data).result
             account?.idToken?.let { idToken ->
-                Log.e("tag data", account.toString())
-
                 coroutineScope.launch {
-                    viewModel.loadGoogle(idToken)
+                    viewModel.loadGoogle(context, idToken)
                 }
 
             }
         } catch (e: Exception) {
-            Log.e("tag error", e.message.toString())
             showToast(context, e.message.toString())
         }
 
@@ -146,6 +142,7 @@ fun LoginScreen(
     }
 
     LaunchedEffect(Unit) {
+        delay(200)
         isContentVisible = true
         multiplePermissionState.launchMultiplePermissionRequest()
     }
@@ -175,7 +172,7 @@ fun LoginScreen(
             uiEvent = LoginUIEvent(
                 onLogin = { email, pass ->
                     coroutineScope.launch {
-                        viewModel.loadLogin(email, pass)
+                        viewModel.loadLogin(context, email, pass)
                     }
                 },
                 onGoogle = {
@@ -226,7 +223,7 @@ fun LoginContent(
                 }
         ) {
             Image(
-                painter = painterResource(id = R.drawable.bgg_blue),
+                painter = painterResource(id = R.drawable.bgg_orange),
                 contentDescription = null,
                 contentScale = ContentScale.FillBounds,
                 modifier = Modifier
@@ -254,9 +251,10 @@ fun LoginContent(
                     painter = painterResource(id = R.drawable.logo),
                     contentDescription = null,
                     modifier = Modifier
-                        .shadow(8.dp, RoundedCornerShape(16.dp))
+                        .background(Color.White, RoundedCornerShape(16.dp))
+                        .padding(4.dp)
                         .clip(RoundedCornerShape(16.dp))
-                        .size(40.dp)
+                        .size(36.dp)
                 )
 
                 Spacer(Modifier.width(8.dp))
