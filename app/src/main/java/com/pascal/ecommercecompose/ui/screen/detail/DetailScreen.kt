@@ -35,11 +35,14 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
@@ -50,8 +53,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.pascal.ecommercecompose.R
 import com.pascal.ecommercecompose.domain.model.dummy.Product
+import com.pascal.ecommercecompose.ui.component.dialog.ShowDialog
+import com.pascal.ecommercecompose.ui.component.screenUtils.LoadingScreen
 import com.pascal.ecommercecompose.ui.component.screenUtils.TopAppBarWithBack
 import com.pascal.ecommercecompose.ui.theme.AppTheme
 import com.pascal.ecommercecompose.ui.theme.black
@@ -65,6 +71,7 @@ import com.pascal.ecommercecompose.ui.theme.red
 import com.pascal.ecommercecompose.ui.theme.skyBlue
 import com.pascal.ecommercecompose.ui.theme.titleTextColor
 import com.pascal.ecommercecompose.ui.theme.white
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -75,15 +82,43 @@ fun DetailScreen(
     viewModel: DetailViewModel = koinViewModel(),
     onNavBack: () -> Unit
 ) {
+    val context = LocalContext.current
+    val coroutine = rememberCoroutineScope()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
     Surface(
         modifier = modifier.padding(paddingValues),
         color = MaterialTheme.colorScheme.background
     ) {
-        DetailContent(
-            product = product
-        ) {
+        if (uiState.isLoading) {
+            LoadingScreen()
+        }
+        if (uiState.isError) {
+            ShowDialog(
+                message = uiState.message,
+                textButton = stringResource(R.string.close),
+                color = MaterialTheme.colorScheme.primary
+            ) {
+                viewModel.setError(false)
+            }
+        }
+        if (uiState.isSuccess) {
             onNavBack()
         }
+
+        DetailContent(
+            product = product,
+            uiEvent = DetailUIEvent(
+                onCart = {
+                    coroutine.launch {
+                        viewModel.getCart(context, product)
+                    }
+                },
+                onNavBack = {
+                    onNavBack()
+                }
+            )
+        )
     }
 }
 
@@ -92,21 +127,21 @@ fun DetailScreen(
 fun DetailContent(
     modifier: Modifier = Modifier,
     product: Product? = null,
-    onNavBack: () -> Unit
+    uiEvent: DetailUIEvent
 ) {
     Scaffold(
         modifier = modifier,
         topBar = {
             TopAppBarWithBack(
                 onBackClick = {
-                    onNavBack()
+                    uiEvent.onNavBack()
                 },
             )
         },
         containerColor = lightgraybg,
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { },
+                onClick = { uiEvent.onCart(product) },
                 containerColor = orange
             ) {
                 Icon(
@@ -415,6 +450,8 @@ fun ProductItemColorWithDesc(product: Product?) {
 @Composable
 private fun DetailPreview() {
     AppTheme {
-        DetailContent() {}
+        DetailContent(
+            uiEvent = DetailUIEvent()
+        )
     }
 }

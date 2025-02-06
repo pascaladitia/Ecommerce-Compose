@@ -43,4 +43,9 @@ class RegisterViewModel(
     fun setError(bool: Boolean) {
         _uiState.update { it.copy(isError = bool) }
     }
+
+    override fun onCleared() {
+        super.onCleared()
+        _uiState.update { it.copy(isRegister = false) }
+    }
 }

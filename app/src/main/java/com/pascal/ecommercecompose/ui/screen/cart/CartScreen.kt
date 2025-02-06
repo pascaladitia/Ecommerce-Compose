@@ -1,4 +1,4 @@
-package com.pascal.ecommercecompose.ui.screen.live
+package com.pascal.ecommercecompose.ui.screen.cart
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
@@ -9,6 +9,8 @@ import org.koin.androidx.compose.koinViewModel
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -18,15 +20,20 @@ import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.ParagraphStyle
 import androidx.compose.ui.text.SpanStyle
@@ -35,7 +42,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.pascal.ecommercecompose.R.*
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.pascal.ecommercecompose.data.local.entity.ProductEntity
 import com.pascal.ecommercecompose.ui.screen.home.TopAppBarHeader
 import com.pascal.ecommercecompose.ui.theme.lightGrey
 import com.pascal.ecommercecompose.ui.theme.lightsilverbox
@@ -51,17 +59,30 @@ fun CartScreen(
     viewModel: CartViewModel = koinViewModel(),
     onDetail: () -> Unit
 ) {
+    val context = LocalContext.current
+    val coroutine = rememberCoroutineScope()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(Unit) {
+        viewModel.getCart()
+    }
+
     Surface(
         modifier = modifier.padding(paddingValues),
         color = MaterialTheme.colorScheme.background
     ) {
-        CartContent()
+        CartContent(
+            product = uiState.product,
+            uiEvent = CartUIEvent()
+        )
     }
 }
 
-@Preview(showBackground = true)
 @Composable
-fun CartContent() {
+fun CartContent(
+    product: List<ProductEntity> = emptyList(),
+    uiEvent: CartUIEvent
+) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -76,9 +97,15 @@ fun CartContent() {
             Spacer(modifier = Modifier.padding(5.dp))
             DeleteCart()
             Spacer(modifier = Modifier.padding(20.dp))
-            CartItemList()
+            CartItemList(
+                product = product,
+                uiEvent = uiEvent
+            )
             Spacer(modifier = Modifier.padding(20.dp))
-            NextButtonWithTotalItems()
+            NextButtonWithTotalItems(
+                product = product,
+                uiEvent = uiEvent
+            )
         }
     }
 }
@@ -128,36 +155,28 @@ fun DeleteCart() {
 }
 
 @Composable
-fun CartItemList() {
-    Column(
-        modifier = Modifier.fillMaxSize(),
+fun CartItemList(
+    modifier: Modifier = Modifier,
+    product: List<ProductEntity>,
+    uiEvent: CartUIEvent
+) {
+    LazyColumn(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(400.dp),
+        contentPadding = PaddingValues(horizontal = 5.dp),
         verticalArrangement = Arrangement.spacedBy(40.dp)
     ) {
-        ProductCartItems(
-            imagePainter = painterResource(id = drawable.shooe_tilt_1),
-            title = "NIKE AIR MAX 200",
-            price = "240.00",
-            pricetag = "$",
-            count = "x1",
-            backgroundColor = lightsilverbox
-        )
-        ProductCartItems(
-            imagePainter = painterResource(id = drawable.small_tilt_shoe_3),
-            title = "NIKE AIR MAX 97",
-            price = "190.00",
-            pricetag = "$",
-            count = "x1",
-            backgroundColor = lightsilverbox
-        )
-        ProductCartItems(
-            imagePainter = painterResource(id = drawable.small_tilt_shoe_2),
-            title = "NIKE AIR MAX 200",
-            price = "220.00",
-            pricetag = "$",
-            count = "x1",
-            backgroundColor = lightsilverbox
-        )
-
+        items(product) {
+            ProductCartItems(
+                imagePainter = painterResource(id = it.imageID),
+                title = it.name,
+                price = it.price.toString(),
+                pricetag = "$",
+                count = it.qty.toString(),
+                backgroundColor = lightsilverbox
+            )
+        }
     }
 }
 
@@ -168,7 +187,7 @@ fun ProductCartItems(
     price: String = "",
     pricetag: String = "",
     count: String = "",
-    backgroundColor: Color = Color.Transparent
+    backgroundColor: Color = Color.Transparent,
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -253,9 +272,13 @@ fun ProductCartItems(
 }
 
 @Composable
-fun NextButtonWithTotalItems() {
-    Column(modifier = Modifier.fillMaxWidth()) {
-        Divider(color = lightGrey, thickness = 2.dp)
+fun NextButtonWithTotalItems(
+    modifier: Modifier = Modifier,
+    product: List<ProductEntity>,
+    uiEvent: CartUIEvent
+) {
+    Column(modifier = modifier.fillMaxWidth()) {
+        HorizontalDivider(color = lightGrey, thickness = 2.dp)
         Spacer(modifier = Modifier.padding(8.dp))
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -263,13 +286,13 @@ fun NextButtonWithTotalItems() {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "3 Items",
+                text = "${product.size} Items",
                 fontSize = 14.sp,
                 color = lightGrey
             )
 
             Text(
-                text = "$650.00",
+                text = "$${product.sumOf { it.price * it.qty }}",
                 fontSize = 18.sp,
                 color = titleTextColor,
                 fontWeight = FontWeight.Bold
@@ -304,6 +327,8 @@ fun NextButtonWithTotalItems() {
 @Composable
 private fun CartPreview() {
     AppTheme {
-        CartContent()
+        CartContent(
+            uiEvent = CartUIEvent()
+        )
     }
 }

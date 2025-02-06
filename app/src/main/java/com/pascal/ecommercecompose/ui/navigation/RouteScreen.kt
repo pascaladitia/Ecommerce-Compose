@@ -13,7 +13,7 @@ import androidx.navigation.compose.rememberNavController
 import com.pascal.ecommercecompose.data.prefs.PreferencesLogin
 import com.pascal.ecommercecompose.ui.screen.detail.DetailScreen
 import com.pascal.ecommercecompose.ui.screen.home.HomeScreen
-import com.pascal.ecommercecompose.ui.screen.live.CartScreen
+import com.pascal.ecommercecompose.ui.screen.cart.CartScreen
 import com.pascal.ecommercecompose.ui.screen.login.LoginScreen
 import com.pascal.ecommercecompose.ui.screen.profile.ProfileScreen
 import com.pascal.ecommercecompose.ui.screen.register.RegisterScreen
@@ -114,7 +114,8 @@ fun RouteScreen(
                     paddingValues = paddingValues,
                     product = getFromPreviousBackStack(navController, "item"),
                     onNavBack = {
-                        navController.navigateUp()
+                        navController.popBackStack()
+                        navController.navigate(Screen.HomeScreen.route)
                     }
                 )
             }

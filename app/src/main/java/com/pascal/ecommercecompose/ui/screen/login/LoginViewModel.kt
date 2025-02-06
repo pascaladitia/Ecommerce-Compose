@@ -81,4 +81,8 @@ class LoginViewModel(
         _uiState.update { it.copy(isError = bool) }
     }
 
+    override fun onCleared() {
+        super.onCleared()
+        _uiState.update { it.copy(isLogin = false) }
+    }
 }
