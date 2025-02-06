@@ -24,19 +24,15 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -57,11 +53,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.pascal.ecommercecompose.R
 import com.pascal.ecommercecompose.ui.component.form.Search
-import com.pascal.ecommercecompose.ui.screen.live.LiveViewModel
 import com.pascal.ecommercecompose.ui.theme.AppTheme
 import com.pascal.ecommercecompose.ui.theme.lightGrey
 import com.pascal.ecommercecompose.ui.theme.lightblack
-import com.pascal.ecommercecompose.ui.theme.lightbox
 import com.pascal.ecommercecompose.ui.theme.lightorange
 import com.pascal.ecommercecompose.ui.theme.orange
 import com.pascal.ecommercecompose.ui.theme.subTitleTextColor
@@ -79,13 +73,16 @@ fun HomeScreen(
         modifier = modifier.padding(paddingValues),
         color = MaterialTheme.colorScheme.background
     ) {
-        HomeContent()
+        HomeContent() {
+            onDetail()
+        }
     }
 }
 
 @Composable
 fun HomeContent(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onDetail: () -> Unit
 ) {
     Box(
         modifier = modifier
@@ -99,7 +96,9 @@ fun HomeContent(
             Spacer(modifier = Modifier.padding(20.dp))
             ProductCategory()
             Spacer(modifier = Modifier.padding(20.dp))
-            ProductWidget()
+            ProductWidget() {
+
+            }
         }
     }
 }
@@ -272,7 +271,10 @@ fun ProductCategory() {
 }
 
 @Composable
-fun ProductWidget() {
+fun ProductWidget(
+    modifier: Modifier = Modifier,
+    onDetail: () -> Unit
+) {
     val productImagesList = listOf<Int>(
         R.drawable.shooe_tilt_1,
         R.drawable.shoe_tilt_2,
@@ -283,7 +285,7 @@ fun ProductWidget() {
     val productPriceTagitemList = listOf("$ ", "$ ")
 
     LazyRow(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .wrapContentHeight(),
         contentPadding = PaddingValues(horizontal = 5.dp),
@@ -292,7 +294,6 @@ fun ProductWidget() {
         items(productImagesList.size) { item ->
             Card(
                 modifier = Modifier
-                    .clickable {  }
                     .width(180.dp)
                     .wrapContentHeight(),
                 shape = RoundedCornerShape(24.dp),
@@ -302,6 +303,8 @@ fun ProductWidget() {
 
                 Column(
                     modifier = Modifier
+                        .clip(RoundedCornerShape(24.dp))
+                        .clickable { onDetail() }
                         .fillMaxWidth()
                         .wrapContentHeight()
                         .padding(12.dp)
@@ -389,6 +392,6 @@ fun ProductWidget() {
 @Composable
 private fun HomePreview() {
     AppTheme {
-        HomeContent()
+        HomeContent() {}
     }
 }

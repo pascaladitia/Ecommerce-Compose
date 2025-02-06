@@ -10,8 +10,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.pascal.ecommercecompose.data.prefs.PreferencesLogin
+import com.pascal.ecommercecompose.ui.screen.detail.DetailScreen
 import com.pascal.ecommercecompose.ui.screen.home.HomeScreen
-import com.pascal.ecommercecompose.ui.screen.live.LiveScreen
+import com.pascal.ecommercecompose.ui.screen.live.CartScreen
 import com.pascal.ecommercecompose.ui.screen.login.LoginScreen
 import com.pascal.ecommercecompose.ui.screen.profile.ProfileScreen
 import com.pascal.ecommercecompose.ui.screen.register.RegisterScreen
@@ -29,7 +30,7 @@ fun RouteScreen(
         bottomBar = {
             if (currentRoute in listOf(
                     Screen.HomeScreen.route,
-                    Screen.LiveScreen.route,
+                    Screen.CartScreen.route,
                     Screen.ProfileScreen.route
                 )) {
                 BottomBar(navController)
@@ -84,12 +85,12 @@ fun RouteScreen(
                 HomeScreen(
                     paddingValues = paddingValues,
                     onDetail = {
-                        navController.popBackStack()
+                        navController.navigate(Screen.DetailScreen.route)
                     }
                 )
             }
-            composable(route = Screen.LiveScreen.route) {
-                LiveScreen(
+            composable(route = Screen.CartScreen.route) {
+                CartScreen(
                     paddingValues = paddingValues,
                     onDetail = {
                         navController.popBackStack()
@@ -100,6 +101,14 @@ fun RouteScreen(
                 ProfileScreen(
                     paddingValues = paddingValues,
                     onDetail = {
+                        navController.popBackStack()
+                    }
+                )
+            }
+            composable(route = Screen.DetailScreen.route) {
+                DetailScreen(
+                    paddingValues = paddingValues,
+                    onNavBack = {
                         navController.popBackStack()
                     }
                 )

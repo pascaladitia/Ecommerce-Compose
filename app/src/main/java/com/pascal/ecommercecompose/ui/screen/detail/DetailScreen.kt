@@ -1,4 +1,4 @@
-package com.pascal.ecommercecompose.ui.screen.live
+package com.pascal.ecommercecompose.ui.screen.detail
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
@@ -8,11 +8,11 @@ import com.pascal.ecommercecompose.ui.theme.AppTheme
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun LiveScreen(
+fun DetailScreen(
     modifier: Modifier = Modifier,
     paddingValues: PaddingValues,
-    viewModel: LiveViewModel = koinViewModel(),
-    onDetail: () -> Unit
+    viewModel: DetailViewModel = koinViewModel(),
+    onNavBack: () -> Unit
 ) {
 
 }
@@ -20,6 +20,6 @@ fun LiveScreen(
 
 @Preview(showBackground = true)
 @Composable
-private fun LivePreview() {
+private fun DetailPreview() {
     AppTheme {  }
 }

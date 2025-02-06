@@ -19,6 +19,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import compose.icons.FeatherIcons
 import compose.icons.feathericons.Home
+import compose.icons.feathericons.ShoppingCart
 import compose.icons.feathericons.User
 import compose.icons.feathericons.Video
 
@@ -43,9 +44,9 @@ fun BottomBar(
                     screen = Screen.HomeScreen
                 ),
                 NavigationItem(
-                    title = "Live",
-                    icon = FeatherIcons.Video,
-                    screen = Screen.LiveScreen
+                    title = "Cart",
+                    icon = FeatherIcons.ShoppingCart,
+                    screen = Screen.CartScreen
                 ),
                 NavigationItem(
                     title = "Profile",

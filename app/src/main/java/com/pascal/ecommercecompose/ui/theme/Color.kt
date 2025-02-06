@@ -12,7 +12,7 @@ val Pink40 = Color(0xFF7D5260)
 
 val Blue40 = Color(0xFF091C3E)
 val white = Color(0XFFFFFFFF)
-val background = Color(0XFFFFFFFF)
+val background = Color(0xFFFCFCFC)
 val lightbox = Color(0XFFF3F3F3)
 val lightSilver = Color(209,215,224)
 
