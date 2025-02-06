@@ -10,6 +10,6 @@ data class CartUIState(
 )
 
 data class CartUIEvent(
-    val onNext: (ProductEntity?) -> Unit = {},
+    val onNext: (List<ProductEntity?>) -> Unit = {},
     val onDelete: () -> Unit = {},
 )

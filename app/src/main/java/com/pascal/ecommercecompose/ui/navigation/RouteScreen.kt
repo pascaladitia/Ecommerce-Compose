@@ -15,6 +15,7 @@ import com.pascal.ecommercecompose.ui.screen.detail.DetailScreen
 import com.pascal.ecommercecompose.ui.screen.home.HomeScreen
 import com.pascal.ecommercecompose.ui.screen.cart.CartScreen
 import com.pascal.ecommercecompose.ui.screen.login.LoginScreen
+import com.pascal.ecommercecompose.ui.screen.report.ReportScreen
 import com.pascal.ecommercecompose.ui.screen.profile.ProfileScreen
 import com.pascal.ecommercecompose.ui.screen.register.RegisterScreen
 import com.pascal.ecommercecompose.ui.screen.splash.SplashScreen
@@ -96,8 +97,9 @@ fun RouteScreen(
             composable(route = Screen.CartScreen.route) {
                 CartScreen(
                     paddingValues = paddingValues,
-                    onDetail = {
-                        navController.popBackStack()
+                    onFinish = {
+                        saveToCurrentBackStack(navController, "cart", it)
+                        navController.navigate(Screen.ReportScreen.route)
                     }
                 )
             }
@@ -116,6 +118,16 @@ fun RouteScreen(
                     onNavBack = {
                         navController.popBackStack()
                         navController.navigate(Screen.HomeScreen.route)
+                    }
+                )
+            }
+            composable(route = Screen.ReportScreen.route) {
+                ReportScreen(
+                    paddingValues = paddingValues,
+                    product = getFromPreviousBackStack(navController, "cart"),
+                    onNavBack = {
+                        navController.popBackStack()
+                        navController.navigate(Screen.CartScreen.route)
                     }
                 )
             }

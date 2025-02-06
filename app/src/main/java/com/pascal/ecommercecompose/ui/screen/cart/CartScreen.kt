@@ -19,7 +19,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Divider
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -28,7 +27,10 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -44,6 +46,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.pascal.ecommercecompose.data.local.entity.ProductEntity
+import com.pascal.ecommercecompose.ui.screen.cart.component.CartPayment
 import com.pascal.ecommercecompose.ui.screen.home.TopAppBarHeader
 import com.pascal.ecommercecompose.ui.theme.lightGrey
 import com.pascal.ecommercecompose.ui.theme.lightsilverbox
@@ -58,11 +61,14 @@ fun CartScreen(
     modifier: Modifier = Modifier,
     paddingValues: PaddingValues,
     viewModel: CartViewModel = koinViewModel(),
-    onDetail: () -> Unit
+    onFinish: (List<ProductEntity?>?) -> Unit
 ) {
     val context = LocalContext.current
     val coroutine = rememberCoroutineScope()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    var snapUrl by remember { mutableStateOf<String?>(null) }
+    var listProduct by remember { mutableStateOf<List<ProductEntity?>?>(null) }
 
     LaunchedEffect(Unit) {
         viewModel.getCart()
@@ -72,19 +78,30 @@ fun CartScreen(
         modifier = modifier.padding(paddingValues),
         color = MaterialTheme.colorScheme.background
     ) {
-        CartContent(
-            product = uiState.product,
-            uiEvent = CartUIEvent(
-                onDelete = {
-                    coroutine.launch {
-                        viewModel.deleteCart()
+        if (snapUrl == null) {
+            CartContent(
+                product = uiState.product,
+                uiEvent = CartUIEvent(
+                    onDelete = {
+                        coroutine.launch {
+                            viewModel.deleteCart()
+                        }
+                    },
+                    onNext = {
+                        listProduct = it
+                        coroutine.launch {
+                            snapUrl = viewModel.createSnapTransaction(it.sumOf { it?.price?.times(it.qty) ?: 0.0 })
+                        }
                     }
-                },
-                onNext = {
-                    
-                }
+                )
             )
-        )
+        } else {
+            CartPayment(
+                snapUrl ?: ""
+            ) {
+                onFinish(listProduct)
+            }
+        }
     }
 }
 
@@ -107,10 +124,7 @@ fun CartContent(
             Spacer(modifier = Modifier.padding(5.dp))
             DeleteCart(uiEvent = uiEvent)
             Spacer(modifier = Modifier.padding(20.dp))
-            CartItemList(
-                product = product,
-                uiEvent = uiEvent
-            )
+            CartItemList(product = product)
             Spacer(modifier = Modifier.padding(20.dp))
             NextButtonWithTotalItems(
                 product = product,
@@ -171,7 +185,6 @@ fun DeleteCart(
 fun CartItemList(
     modifier: Modifier = Modifier,
     product: List<ProductEntity>,
-    uiEvent: CartUIEvent
 ) {
     LazyColumn(
         modifier = modifier
@@ -182,6 +195,7 @@ fun CartItemList(
     ) {
         items(product) {
             ProductCartItems(
+                modifier = Modifier,
                 imagePainter = painterResource(id = it.imageID),
                 title = it.name,
                 price = it.price.toString(),
@@ -195,6 +209,7 @@ fun CartItemList(
 
 @Composable
 fun ProductCartItems(
+    modifier: Modifier = Modifier,
     imagePainter: Painter,
     title: String = "",
     price: String = "",
@@ -203,7 +218,7 @@ fun ProductCartItems(
     backgroundColor: Color = Color.Transparent,
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -314,6 +329,7 @@ fun NextButtonWithTotalItems(
 
         Button(
             onClick = {
+                uiEvent.onNext(product)
             },
             colors = ButtonDefaults.buttonColors(orange),
             modifier = Modifier
