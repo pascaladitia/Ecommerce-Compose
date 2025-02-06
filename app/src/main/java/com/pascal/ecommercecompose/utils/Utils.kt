@@ -29,7 +29,7 @@ fun showToast(context: Context, msg: String) {
 
 fun getCurrentFormattedDate(): String {
     val currentDate = Calendar.getInstance().time
-    val dateFormat = SimpleDateFormat("EEEE, dd MMMM yyyy", Locale.getDefault())
+    val dateFormat = SimpleDateFormat(FORMAT_DATE, Locale.getDefault())
     return dateFormat.format(currentDate)
 }
 

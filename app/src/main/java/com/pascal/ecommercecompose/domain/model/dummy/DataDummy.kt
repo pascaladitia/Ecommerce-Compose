@@ -6,7 +6,7 @@ object DataDummy {
     val product = Product(
         1,
         "Nike Air Max 200",
-        240.00,
+        100.00,
         100,
         R.drawable.shooe_tilt_1,
         "Trending Now",
@@ -18,7 +18,7 @@ object DataDummy {
         product.copy(
             2,
             "Nike Air Max 97",
-            200.00,
+            90.00,
             100,
             R.drawable.shoe_tilt_2,
             "Best Selling",
@@ -27,7 +27,7 @@ object DataDummy {
         product.copy(
             3,
             "Nike Air Max 95",
-            160.00,
+            70.00,
             100,
             R.drawable.shoe_tilt_4,
             "Trending Now",
@@ -36,7 +36,7 @@ object DataDummy {
         product.copy(
             4,
             "Nike Air Max 90",
-            110.00,
+            50.00,
             100,
             R.drawable.shoe_tilt_3,
             "Best Selling",

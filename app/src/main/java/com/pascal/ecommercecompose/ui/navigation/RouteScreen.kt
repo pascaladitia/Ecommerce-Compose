@@ -11,13 +11,13 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.pascal.ecommercecompose.data.prefs.PreferencesLogin
+import com.pascal.ecommercecompose.ui.screen.cart.CartScreen
 import com.pascal.ecommercecompose.ui.screen.detail.DetailScreen
 import com.pascal.ecommercecompose.ui.screen.home.HomeScreen
-import com.pascal.ecommercecompose.ui.screen.cart.CartScreen
 import com.pascal.ecommercecompose.ui.screen.login.LoginScreen
-import com.pascal.ecommercecompose.ui.screen.report.ReportScreen
 import com.pascal.ecommercecompose.ui.screen.profile.ProfileScreen
 import com.pascal.ecommercecompose.ui.screen.register.RegisterScreen
+import com.pascal.ecommercecompose.ui.screen.report.ReportScreen
 import com.pascal.ecommercecompose.ui.screen.splash.SplashScreen
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -127,7 +127,7 @@ fun RouteScreen(
                     product = getFromPreviousBackStack(navController, "cart"),
                     onNavBack = {
                         navController.popBackStack()
-                        navController.navigate(Screen.CartScreen.route)
+                        navController.navigate(Screen.HomeScreen.route)
                     }
                 )
             }

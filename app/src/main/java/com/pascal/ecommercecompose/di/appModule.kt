@@ -5,6 +5,7 @@ import androidx.room.Room
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import com.pascal.ecommercecompose.data.local.database.AppDatabase
 import com.pascal.ecommercecompose.data.local.repository.LocalRepository
 import com.pascal.ecommercecompose.data.repository.Repository
@@ -15,6 +16,7 @@ import com.pascal.ecommercecompose.ui.screen.home.HomeViewModel
 import com.pascal.ecommercecompose.ui.screen.login.LoginViewModel
 import com.pascal.ecommercecompose.ui.screen.profile.ProfileViewModel
 import com.pascal.ecommercecompose.ui.screen.register.RegisterViewModel
+import com.pascal.ecommercecompose.ui.screen.report.ReportViewModel
 import com.pascal.ecommercecompose.utils.Constant
 import kotlinx.coroutines.Dispatchers
 import org.koin.android.ext.koin.androidContext
@@ -34,6 +36,7 @@ val appModule = module {
 
     // Firebase
     single { FirebaseAuth.getInstance() }
+    single { FirebaseFirestore.getInstance() }
     single {
         val context: Context = androidContext()
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -42,7 +45,7 @@ val appModule = module {
             .build()
         GoogleSignIn.getClient(context, gso)
     }
-    single { FirebaseRepository(get(), get()) }
+    single { FirebaseRepository(get(), get(), get()) }
 
     singleOf(::LoginViewModel)
     singleOf(::RegisterViewModel)
@@ -50,4 +53,5 @@ val appModule = module {
     singleOf(::CartViewModel)
     singleOf(::ProfileViewModel)
     singleOf(::DetailViewModel)
+    singleOf(::ReportViewModel)
 }

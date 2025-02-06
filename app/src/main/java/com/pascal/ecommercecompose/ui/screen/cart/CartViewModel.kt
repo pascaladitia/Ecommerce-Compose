@@ -70,16 +70,19 @@ class CartViewModel(
         }
     }
 
-    suspend fun createSnapTransaction(amount: Double?): String? {
+    suspend fun createSnapTransaction(amountInUSD: Double?): String? {
         return withContext(Dispatchers.IO) {
             val serverKey = "SB-Mid-server-Cfh101fZVXbuQQ-3BYueglG-"
             val authHeader = Credentials.basic(serverKey, "")
+
+            val exchangeRate = getUsdToIdrRate()
+            val amountInIDR = (amountInUSD ?: 0.0) * exchangeRate
 
             val client = OkHttpClient()
             val json = JSONObject()
             json.put("transaction_details", JSONObject().apply {
                 put("order_id", "ORDER-${System.currentTimeMillis()}")
-                put("gross_amount", amount)
+                put("gross_amount", amountInIDR.toInt())
             })
 
             val requestBody = RequestBody.create(
@@ -104,6 +107,23 @@ class CartViewModel(
             }
         }
     }
+
+    suspend fun getUsdToIdrRate(): Double {
+        return withContext(Dispatchers.IO) {
+            try {
+                val url = "https://api.exchangerate-api.com/v4/latest/USD"
+                val request = Request.Builder().url(url).get().build()
+                val response = OkHttpClient().newCall(request).execute()
+
+                val json = JSONObject(response.body?.string() ?: "{}")
+                json.getJSONObject("rates").optDouble("IDR", 15000.0)
+            } catch (e: Exception) {
+                e.printStackTrace()
+                15000.0
+            }
+        }
+    }
+
 
 
 }

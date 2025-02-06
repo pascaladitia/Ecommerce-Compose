@@ -18,14 +18,13 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -40,31 +39,41 @@ import com.pascal.ecommercecompose.data.local.entity.ProductEntity
 import com.pascal.ecommercecompose.data.prefs.PreferencesLogin
 import com.pascal.ecommercecompose.ui.component.button.ButtonComponent
 import com.pascal.ecommercecompose.ui.component.screenUtils.CardComponent
-import com.pascal.ecommercecompose.ui.screen.cart.CartViewModel
 import com.pascal.ecommercecompose.ui.theme.AppTheme
 import compose.icons.FeatherIcons
 import compose.icons.feathericons.ChevronLeft
 import compose.icons.feathericons.Download
 import org.koin.androidx.compose.koinViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReportScreen(
     modifier: Modifier = Modifier,
     paddingValues: PaddingValues,
-    viewModel: CartViewModel = koinViewModel(),
+    viewModel: ReportViewModel = koinViewModel(),
     product: List<ProductEntity>? = null,
     onNavBack: () -> Unit
 ) {
     val context = LocalContext.current
-    val scope = rememberCoroutineScope()
+
+    LaunchedEffect(Unit) {
+        viewModel.loadReport(product)
+        viewModel.deleteCart()
+    }
 
     Surface(
         modifier = modifier.padding(paddingValues),
         color = MaterialTheme.colorScheme.background
     ) {
         ReportContent(
-            product = product
+            product = product,
+            uiEvent = ReportUIEvent(
+                onDownload = {
+                    viewModel.generatePdfAndOpen(context, it)
+                },
+                onNavBack = {
+                    onNavBack()
+                }
+            )
         )
     }
 }
@@ -73,8 +82,7 @@ fun ReportScreen(
 fun ReportContent(
     modifier: Modifier = Modifier,
     product: List<ProductEntity>? = emptyList(),
-    onDownload: (List<ProductEntity>?) -> Unit = {},
-    onNavBack: () -> Unit = {}
+    uiEvent: ReportUIEvent
 ) {
     val context = LocalContext.current
     val pref = PreferencesLogin.getLoginResponse(context)
@@ -93,7 +101,7 @@ fun ReportContent(
                 modifier = Modifier
                     .size(24.dp)
                     .clip(CircleShape)
-                    .clickable { onNavBack() },
+                    .clickable { uiEvent.onNavBack() },
                 imageVector = FeatherIcons.ChevronLeft,
                 contentDescription = null
             )
@@ -158,9 +166,9 @@ fun ReportContent(
             LazyColumn(
                 modifier = modifier
                     .fillMaxWidth()
-                    .height(400.dp),
+                    .height(300.dp),
                 contentPadding = PaddingValues(horizontal = 5.dp),
-                verticalArrangement = Arrangement.spacedBy(40.dp)
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 items(product ?: emptyList()) {
                     ReportItemText(
@@ -189,7 +197,7 @@ fun ReportContent(
                 isIcon = 1,
                 icon = FeatherIcons.Download
             ) {
-                onDownload(product)
+                uiEvent.onDownload(product)
             }
         }
 
@@ -239,7 +247,9 @@ fun ReportItemText(
 @Composable
 private fun ReportPreview() {
     AppTheme {
-        ReportContent()
+        ReportContent(
+            uiEvent = ReportUIEvent()
+        )
     }
 }
 

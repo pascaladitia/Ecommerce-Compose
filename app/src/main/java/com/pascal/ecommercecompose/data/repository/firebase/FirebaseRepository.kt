@@ -5,15 +5,19 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
+import com.google.firebase.firestore.FirebaseFirestore
+import com.pascal.ecommercecompose.data.local.entity.ProductEntity
 import com.pascal.ecommercecompose.domain.base.Resource
 import kotlinx.coroutines.tasks.await
 
 class FirebaseRepository(
     private val auth: FirebaseAuth,
-    private val googleSignInClient: GoogleSignInClient
+    private val googleSignInClient: GoogleSignInClient,
+    private val firestore: FirebaseFirestore
 ) {
     fun isUserLoggedIn(): Boolean = auth.currentUser != null
 
+    // Auth
     suspend fun signUp(email: String, password: String): Resource<String> {
         return try {
             val result = auth.createUserWithEmailAndPassword(email, password).await()
@@ -32,6 +36,7 @@ class FirebaseRepository(
         }
     }
 
+    // Google Auth
     suspend fun signInWithGoogle(idToken: String): Resource<FirebaseUser?> {
         return try {
             val credential = GoogleAuthProvider.getCredential(idToken, null)
@@ -48,6 +53,60 @@ class FirebaseRepository(
 
     fun signOut() {
         googleSignInClient.signOut()
+    }
+
+    // Firestore
+    suspend fun addTransaction(products: List<ProductEntity>?): Resource<String> {
+        return try {
+            val transactionData = hashMapOf(
+                "date" to System.currentTimeMillis(),
+                "totalAmount" to products!!.sumOf { it.price * it.qty }
+            )
+
+            val transactionRef = firestore.collection("transactions").add(transactionData).await()
+            val transactionId = transactionRef.id
+
+            val batch = firestore.batch()
+
+            for (product in products) {
+                val productRef = transactionRef.collection("products").document()
+                val productData = hashMapOf(
+                    "name" to product.name,
+                    "price" to product.price,
+                    "qty" to product.qty,
+                    "category" to product.category,
+                    "description" to product.description,
+                    "isliked" to product.isliked,
+                    "imageID" to product.imageID
+                )
+                batch.set(productRef, productData)
+            }
+
+            batch.commit().await()
+            Resource.Success(transactionId)
+        } catch (e: Exception) {
+            Resource.Error(e)
+        }
+    }
+
+
+    suspend fun getProducts(): Resource<List<ProductEntity>> {
+        return try {
+            val snapshot = firestore.collection("transaction").get().await()
+            val products = snapshot.toObjects(ProductEntity::class.java)
+            Resource.Success(products)
+        } catch (e: Exception) {
+            Resource.Error(e)
+        }
+    }
+
+    suspend fun deleteProduct(productId: String): Resource<Boolean> {
+        return try {
+            firestore.collection("transaction").document(productId).delete().await()
+            Resource.Success(true)
+        } catch (e: Exception) {
+            Resource.Error(e)
+        }
     }
 }
 
