@@ -88,7 +88,7 @@ class ReportViewModel(
             tableHeader.setWidth(UnitValue.createPercentValue(100f))
             tableHeader.addCell(Cell().add(logoImage).setBorder(Border.NO_BORDER))
             tableHeader.addCell(
-                Cell().add(Paragraph("Insurance Report").setBold().setFontSize(18f))
+                Cell().add(Paragraph("Transaction Report").setBold().setFontSize(18f))
                     .setTextAlignment(TextAlignment.CENTER)
                     .setBorder(Border.NO_BORDER)
             )
