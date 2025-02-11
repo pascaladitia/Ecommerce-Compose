@@ -11,5 +11,6 @@ object Constant {
     const val BEARER = "Bearer "
     const val FORMAT_DATE = "yyyy-MM-dd"
 
-    const val CLIENT_ID = "556845723199-1blna8ger265a578hccuvte5j9nv8q16.apps.googleusercontent.com"
+    const val CLIENT_ID = "your-ClientID-firebase"
+    const val MIDTRANS_SERVER = "your-midrans-server"
 }
