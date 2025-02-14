@@ -2,7 +2,6 @@ package com.pascal.ecommercecompose.ui.screen.detail
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -20,30 +19,34 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.shape.ZeroCornerSize
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ShoppingCart
-import androidx.compose.material3.Divider
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -54,22 +57,22 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 import com.pascal.ecommercecompose.R
 import com.pascal.ecommercecompose.domain.model.dummy.DataDummy.product
-import com.pascal.ecommercecompose.domain.model.dummy.Product
+import com.pascal.ecommercecompose.domain.model.product.ProductDetails
+import com.pascal.ecommercecompose.domain.model.product.Review
 import com.pascal.ecommercecompose.ui.component.dialog.ShowDialog
 import com.pascal.ecommercecompose.ui.component.screenUtils.LoadingScreen
+import com.pascal.ecommercecompose.ui.component.screenUtils.RatingBar
 import com.pascal.ecommercecompose.ui.component.screenUtils.TopAppBarWithBack
 import com.pascal.ecommercecompose.ui.theme.AppTheme
-import com.pascal.ecommercecompose.ui.theme.black
 import com.pascal.ecommercecompose.ui.theme.grey
-import com.pascal.ecommercecompose.ui.theme.lightBlue
 import com.pascal.ecommercecompose.ui.theme.lightGrey
 import com.pascal.ecommercecompose.ui.theme.lightblack
 import com.pascal.ecommercecompose.ui.theme.lightgraybg
 import com.pascal.ecommercecompose.ui.theme.orange
-import com.pascal.ecommercecompose.ui.theme.red
-import com.pascal.ecommercecompose.ui.theme.skyBlue
 import com.pascal.ecommercecompose.ui.theme.titleTextColor
 import com.pascal.ecommercecompose.ui.theme.white
 import kotlinx.coroutines.launch
@@ -87,13 +90,16 @@ fun DetailScreen(
     val coroutine = rememberCoroutineScope()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
+    LaunchedEffect(Unit) {
+        viewModel.loadProductsDetail(productId)
+    }
+
     Surface(
         modifier = modifier.padding(paddingValues),
         color = MaterialTheme.colorScheme.background
     ) {
-        if (uiState.isLoading) {
-            LoadingScreen()
-        }
+        if (uiState.isSuccess) onNavBack()
+        if (uiState.isLoading) LoadingScreen()
         if (uiState.isError) {
             ShowDialog(
                 message = uiState.message,
@@ -103,16 +109,13 @@ fun DetailScreen(
                 viewModel.setError(false)
             }
         }
-        if (uiState.isSuccess) {
-            onNavBack()
-        }
 
         DetailContent(
-            product = product,
+            product = uiState.product,
             uiEvent = DetailUIEvent(
                 onCart = {
                     coroutine.launch {
-                        viewModel.getCart(context, product)
+                        viewModel.getCart(context, it)
                     }
                 },
                 onNavBack = {
@@ -127,11 +130,11 @@ fun DetailScreen(
 @Composable
 fun DetailContent(
     modifier: Modifier = Modifier,
-    product: Product? = null,
+    product: ProductDetails? = null,
     uiEvent: DetailUIEvent
 ) {
     Scaffold(
-        modifier = modifier,
+        modifier = modifier.fillMaxSize(),
         topBar = {
             TopAppBarWithBack(
                 onBackClick = {
@@ -152,7 +155,6 @@ fun DetailContent(
                 )
             }
         },
-
         content = {
             Box(
                 modifier = Modifier
@@ -163,6 +165,7 @@ fun DetailContent(
                     modifier = Modifier.fillMaxSize()
                 ) {
                     val (imagesliderref, addtocartref) = createRefs()
+
                     Box(modifier = Modifier
                         .height(280.dp)
                         .constrainAs(imagesliderref) {
@@ -171,12 +174,12 @@ fun DetailContent(
                             start.linkTo(parent.start)
                             end.linkTo(parent.end)
                         }) {
-                        HeaderImagesSlider(product)
+                        HeaderImagesSlider(product = product)
                     }
+
                     Surface(
                         color = white,
-                        shape = RoundedCornerShape(40.dp)
-                            .copy(
+                        shape = RoundedCornerShape(40.dp).copy(
                                 bottomStart = ZeroCornerSize,
                                 bottomEnd = ZeroCornerSize
                             ),
@@ -194,18 +197,24 @@ fun DetailContent(
                                 .fillMaxSize()
                                 .padding(30.dp)
                         ) {
-                            ProductTitle(product)
+                            ProductTitle(product = product)
+
                             Spacer(modifier = Modifier.padding(10.dp))
-                            ProductAvailableSize()
+
+                            ProductAvailableSize(product = product)
+
                             Spacer(modifier = Modifier.padding(10.dp))
-                            ProductItemColorWithDesc(product)
+
+                            ProductItemColorWithDesc(product = product)
+
+                            Spacer(modifier = Modifier.padding(10.dp))
+
+                            ProductReviews(product = product)
+
+                            Spacer(modifier = Modifier.padding(30.dp))
                         }
-
-
                     }
-
                 }
-
             }
         }
     )
@@ -215,24 +224,33 @@ fun DetailContent(
 
 @Composable
 fun HeaderImagesSlider(
-    product: Product? = null
+    modifier: Modifier = Modifier,
+    product: ProductDetails? = null
 ) {
-    val showThumbImagesList = listOf<Int>(
-        R.drawable.show_1,
-        R.drawable.shoe_thumb_1,
-        R.drawable.shoe_thumb_4,
-        R.drawable.shoe_thumb_3
-    )
+    var isSelect by remember { mutableIntStateOf(0) }
+    var showImage by remember { mutableStateOf(product?.images?.get(0)) }
+
+    LaunchedEffect(product) {
+        showImage = product?.images?.get(0)
+    }
+
     Column(
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .fillMaxHeight()
     ) {
         Image(
+            painter = rememberAsyncImagePainter(
+                ImageRequest.Builder(LocalContext.current)
+                    .data(data = product?.thumbnail ?: "")
+                    .error(R.drawable.no_thumbnail)
+                    .placeholder(R.drawable.loading)
+                    .apply { crossfade(true) }
+                    .build()
+            ),
             contentScale = ContentScale.Fit,
-            painter = painterResource(id = product?.imageID ?: R.drawable.logo),
             contentDescription = "",
             modifier = Modifier
                 .size(230.dp)
@@ -244,19 +262,29 @@ fun HeaderImagesSlider(
                 .padding(horizontal = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            items(showThumbImagesList.size) { item ->
+            itemsIndexed(product?.images ?: emptyList()) { index, item ->
                 Box(
                     modifier = Modifier
                         .height(60.dp)
                         .width(62.dp)
                         .border(
-                            color = if (item == 0) orange else lightGrey,
+                            color = if (index == isSelect) orange else lightGrey,
                             width = 2.dp,
                             shape = RoundedCornerShape(16.dp)
                         )
-                        .clickable { }) {
+                        .clickable {
+                            isSelect = index
+                            showImage = item
+                        }
+                ) {
                     Image(
-                        painter = painterResource(showThumbImagesList[item]),
+                        painter = rememberAsyncImagePainter(
+                            ImageRequest.Builder(LocalContext.current)
+                                .data(data = showImage ?: "")
+                                .placeholder(R.drawable.loading)
+                                .apply { crossfade(true) }
+                                .build()
+                        ),
                         contentDescription = "",
                         modifier = Modifier
                             .size(50.dp, 50.dp)
@@ -276,17 +304,21 @@ fun HeaderImagesSlider(
 }
 
 @Composable
-fun ProductTitle(product: Product?) {
+fun ProductTitle(
+    modifier: Modifier = Modifier,
+    product: ProductDetails? = null
+) {
     Column(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Divider(
+        HorizontalDivider(
             color = grey,
             modifier = Modifier
                 .height(4.dp)
                 .width(40.dp)
         )
+
         Spacer(modifier = Modifier.padding(5.dp))
 
         Row(
@@ -295,7 +327,8 @@ fun ProductTitle(product: Product?) {
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                text = product?.name ?: "",
+                modifier = Modifier.weight(1f),
+                text = product?.title ?: "",
                 color = titleTextColor,
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold
@@ -333,12 +366,14 @@ fun ProductTitle(product: Product?) {
 }
 
 @Composable
-fun ProductAvailableSize() {
-    val itemListavailablesize = listOf("US6", "US7", "US8", "US9")
-    Column(modifier = Modifier.fillMaxWidth()) {
+fun ProductAvailableSize(
+    modifier: Modifier = Modifier,
+    product: ProductDetails? = null
+) {
+    Column(modifier = modifier.fillMaxWidth()) {
 
         Text(
-            text = "Available Sizes",
+            text = "Tags Product",
             color = titleTextColor,
             fontSize = 18.sp
         )
@@ -348,13 +383,13 @@ fun ProductAvailableSize() {
             modifier = Modifier
                 .fillMaxWidth()
         ) {
-            items(itemListavailablesize.size) { item ->
+            items(product?.tags ?: emptyList()) { item ->
                 Box(
                     modifier = Modifier
                         .height(40.dp)
                         .width(70.dp)
                         .border(
-                            color = if (item == 1) orange else lightGrey,
+                            color = lightGrey,
                             width = 2.dp,
                             shape = RoundedCornerShape(10.dp)
                         )
@@ -367,9 +402,9 @@ fun ProductAvailableSize() {
                                 top = 10.dp,
                                 bottom = 8.dp
                             ),
-                        text = itemListavailablesize[item],
+                        text = item,
                         fontWeight = FontWeight.Bold,
-                        color = if (item == 1) titleTextColor else Color.LightGray
+                        color = Color.LightGray
                     )
 
 
@@ -381,58 +416,11 @@ fun ProductAvailableSize() {
 }
 
 @Composable
-fun ProductItemColorWithDesc(product: Product?) {
-    Column(modifier = Modifier.fillMaxWidth()) {
-        Text(
-            text = "Color",
-            color = titleTextColor,
-            fontSize = 18.sp
-        )
-        Spacer(modifier = Modifier.padding(10.dp))
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(30.dp)
-                    .clip(shape = CircleShape)
-                    .background(orange)
-                    .clickable { }
-            )
-            Box(
-                modifier = Modifier
-                    .size(30.dp)
-                    .clip(shape = CircleShape)
-                    .background(lightBlue)
-                    .clickable { }
-            )
-            Box(
-                modifier = Modifier
-                    .size(30.dp)
-                    .clip(shape = CircleShape)
-                    .background(black)
-                    .clickable { }
-            )
-            Box(
-                modifier = Modifier
-                    .size(30.dp)
-                    .clip(shape = CircleShape)
-                    .background(red)
-                    .clickable { }
-            )
-            Box(
-                modifier = Modifier
-                    .size(30.dp)
-                    .clip(shape = CircleShape)
-                    .background(skyBlue)
-                    .clickable { }
-            )
-        }
-        Spacer(modifier = Modifier.padding(10.dp))
+fun ProductItemColorWithDesc(
+    modifier: Modifier = Modifier,
+    product: ProductDetails? = null
+) {
+    Column(modifier = modifier.fillMaxSize()) {
         Text(
             text = "Description",
             color = titleTextColor,
@@ -447,11 +435,68 @@ fun ProductItemColorWithDesc(product: Product?) {
     }
 }
 
+@Composable
+fun ProductReviews(
+    modifier: Modifier = Modifier,
+    product: ProductDetails? = null
+) {
+    Column(modifier = modifier.fillMaxWidth()) {
+        Text(
+            text = "Reviews",
+            color = titleTextColor,
+            fontSize = 18.sp
+        )
+
+        Spacer(modifier = Modifier.padding(10.dp))
+
+        LazyRow(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            items(product?.reviews ?: emptyList()) { item ->
+                Box(
+                    modifier = Modifier
+                        .border(
+                            color = lightGrey,
+                            width = 2.dp,
+                            shape = RoundedCornerShape(10.dp)
+                        )
+                ) {
+                    Column(
+                        modifier = Modifier.padding(20.dp)
+                    ) {
+                        Text(
+                            text = item.reviewerName ?: "No Name",
+                            fontWeight = FontWeight.Bold,
+                            color = titleTextColor,
+                            fontSize = 12.sp
+                        )
+
+                        Text(
+                            text = item.comment ?: "-",
+                            fontWeight = FontWeight.Bold,
+                            color = Color.LightGray,
+                            fontSize = 12.sp
+                        )
+
+                        RatingBar(rating = item.rating?.toDouble() ?: 0.0)
+                    }
+                }
+                Spacer(modifier = Modifier.width(10.dp))
+            }
+        }
+    }
+}
+
 @Preview(showBackground = true)
 @Composable
 private fun DetailPreview() {
     AppTheme {
         DetailContent(
+            product = ProductDetails(
+                tags = listOf("Tags1", "Tags2"),
+                description = "Sample desc",
+                reviews = listOf(Review(), Review())
+            ),
             uiEvent = DetailUIEvent()
         )
     }

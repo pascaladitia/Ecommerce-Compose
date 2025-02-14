@@ -5,8 +5,7 @@ import androidx.lifecycle.ViewModel
 import com.pascal.ecommercecompose.data.local.entity.ProductEntity
 import com.pascal.ecommercecompose.data.local.repository.LocalRepository
 import com.pascal.ecommercecompose.data.repository.Repository
-import com.pascal.ecommercecompose.domain.base.UiState
-import com.pascal.ecommercecompose.domain.model.dummy.Product
+import com.pascal.ecommercecompose.domain.model.product.ProductDetails
 import com.pascal.ecommercecompose.utils.showToast
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -20,16 +19,38 @@ class DetailViewModel(
     private val _uiState = MutableStateFlow(DetailUIState())
     val uiState get() = _uiState.asStateFlow()
 
-    suspend fun getCart(context: Context, product: Product?) {
+    suspend fun loadProductsDetail(id: String?) {
+        _uiState.update { it.copy(isLoading = true) }
+
+        try {
+            val result = repository.getProductById(id?.toIntOrNull() ?: 0)
+            _uiState.update {
+                it.copy(
+                    isLoading = false,
+                    product = result
+                )
+            }
+        } catch (e: Exception) {
+            _uiState.update {
+                it.copy(
+                    isLoading = false,
+                    isError = true,
+                    message = e.message.toString()
+                )
+            }
+        }
+    }
+
+    suspend fun getCart(context: Context, product: ProductDetails?) {
         _uiState.update { it.copy(isLoading = true) }
 
         try {
             val entity = ProductEntity(
                 id = product?.id?.toLong() ?: 0L,
-                name = product?.name ?: "",
+                name = product?.title ?: "",
                 price = product?.price ?: 0.0,
-                isliked = product?.isliked ?: 0,
-                imageID = product?.imageID ?: 0,
+                isliked = 0,
+                imageID = 0,
                 category = product?.category ?: "",
                 description = product?.description ?: "",
                 qty = 1
@@ -89,5 +110,4 @@ class DetailViewModel(
         super.onCleared()
         _uiState.update { it.copy(isSuccess = false) }
     }
-
 }
