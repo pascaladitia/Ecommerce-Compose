@@ -90,8 +90,7 @@ fun RouteScreen(
                 HomeScreen(
                     paddingValues = paddingValues,
                     onDetail = {
-                        saveToCurrentBackStack(navController, "item", it)
-                        navController.navigate(Screen.DetailScreen.route)
+                        navController.navigate(Screen.DetailScreen.createRoute(it ?: ""))
                     }
                 )
             }
@@ -124,7 +123,7 @@ fun RouteScreen(
             composable(route = Screen.DetailScreen.route) {
                 DetailScreen(
                     paddingValues = paddingValues,
-                    product = getFromPreviousBackStack(navController, "item"),
+                    productId = it.arguments?.getString("id") ?: "",
                     onNavBack = {
                         navController.popBackStack()
                         navController.navigate(Screen.HomeScreen.route)

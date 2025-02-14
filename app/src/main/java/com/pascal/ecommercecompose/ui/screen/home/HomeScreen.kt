@@ -20,13 +20,13 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.FavoriteBorder
-import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -37,7 +37,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
@@ -59,26 +59,25 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.pascal.ecommercecompose.R
 import com.pascal.ecommercecompose.data.prefs.PreferencesLogin
-import com.pascal.ecommercecompose.domain.model.dummy.DataDummy.productList
-import com.pascal.ecommercecompose.domain.model.dummy.Product
-import com.pascal.ecommercecompose.domain.model.product.ProductResponse
+import com.pascal.ecommercecompose.domain.model.product.ProductDetails
 import com.pascal.ecommercecompose.domain.model.user.User
 import com.pascal.ecommercecompose.ui.component.dialog.ShowDialog
 import com.pascal.ecommercecompose.ui.component.form.Search
 import com.pascal.ecommercecompose.ui.component.screenUtils.LoadingScreen
+import com.pascal.ecommercecompose.ui.component.screenUtils.PullRefreshComponent
+import com.pascal.ecommercecompose.ui.component.screenUtils.TopAppBarHeader
 import com.pascal.ecommercecompose.ui.theme.AppTheme
 import com.pascal.ecommercecompose.ui.theme.lightGrey
-import com.pascal.ecommercecompose.ui.theme.lightblack
 import com.pascal.ecommercecompose.ui.theme.lightorange
 import com.pascal.ecommercecompose.ui.theme.orange
 import com.pascal.ecommercecompose.ui.theme.subTitleTextColor
 import com.pascal.ecommercecompose.ui.theme.titleTextColor
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -86,7 +85,7 @@ fun HomeScreen(
     modifier: Modifier = Modifier,
     paddingValues: PaddingValues,
     viewModel: HomeViewModel = koinViewModel(),
-    onDetail: (Product) -> Unit
+    onDetail: (String?) -> Unit
 ) {
     val context = LocalContext.current
     val coroutine = rememberCoroutineScope()
@@ -96,6 +95,7 @@ fun HomeScreen(
 
     LaunchedEffect(Unit) {
         viewModel.loadProducts()
+        viewModel.loadCategory()
     }
 
     Surface(
@@ -113,15 +113,29 @@ fun HomeScreen(
             }
         }
 
-        HomeContent(
-            user = pref,
-            data = uiState.data,
-            uiEvent = HomeUIEvent(
-                onDetail = {
-
-                }
+        PullRefreshComponent(
+            onRefresh = {
+                viewModel.loadProducts()
+            }
+        ) {
+            HomeContent(
+                user = pref,
+                uiState = uiState,
+                uiEvent = HomeUIEvent(
+                    onSearch = {
+                        viewModel.searchProduct(it)
+                    },
+                    onCategory = {
+                        coroutine.launch {
+                            viewModel.loadProductsByCategory(it)
+                        }
+                    },
+                    onDetail = {
+                        onDetail(it?.id.toString())
+                    }
+                )
             )
-        )
+        }
     }
 }
 
@@ -129,7 +143,7 @@ fun HomeScreen(
 fun HomeContent(
     modifier: Modifier = Modifier,
     user: User? = null,
-    data: ProductResponse? = null,
+    uiState: HomeUIState,
     uiEvent: HomeUIEvent,
 ) {
     Box(
@@ -139,20 +153,23 @@ fun HomeContent(
     ) {
         Column(modifier = Modifier.padding(30.dp)) {
 
-            TopAppBarHeader(user)
+            TopAppBarHeader(user = user)
 
             Spacer(modifier = Modifier.padding(10.dp))
 
-            OurProductsWithSearch()
+            OurProductsWithSearch(uiEvent = uiEvent)
 
             Spacer(modifier = Modifier.padding(20.dp))
 
-            ProductCategory()
+            ProductCategory(
+                category = uiState.category,
+                uiEvent = uiEvent
+            )
 
             Spacer(modifier = Modifier.padding(20.dp))
 
             ProductWidget(
-                data = data,
+                product = uiState.product,
                 uiEvent = uiEvent
             )
         }
@@ -160,65 +177,15 @@ fun HomeContent(
 }
 
 @Composable
-fun TopAppBarHeader(user: User?) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.Top
-    ) {
-        Card(
-            modifier = Modifier
-                .width(50.dp),
-            elevation = CardDefaults.cardElevation(6.dp),
-            shape = RoundedCornerShape(12.dp),
-            colors =  CardDefaults.cardColors(Color.White)
-        ) {
-            IconButton(onClick = { }) {
-                Icon(
-                    imageVector = Icons.Outlined.Menu,
-                    contentDescription = ""
-                )
-
-            }
-        }
-
-        Card(
-            modifier = Modifier
-                .size(50.dp),
-            elevation = CardDefaults.cardElevation(6.dp),
-            shape = RoundedCornerShape(12.dp),
-            colors =  CardDefaults.cardColors(Color.White)
-        ) {
-            Image(
-                painter = rememberAsyncImagePainter(
-                    ImageRequest.Builder(LocalContext.current)
-                        .data(data = user?.photo_url?.toUri())
-                        .error(R.drawable.no_profile)
-                        .apply { crossfade(true) }
-                        .build()
-                ),
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .size(60.dp)
-                    .background(MaterialTheme.colorScheme.background, CircleShape)
-            )
-        }
-
-    }
-}
-
-@Composable
-fun OurProductsWithSearch() {
-    var search by remember { mutableStateOf("") }
-
+fun OurProductsWithSearch(
+    modifier: Modifier = Modifier,
+    uiEvent: HomeUIEvent
+) {
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth(),
         verticalArrangement = Arrangement.Top
     ) {
-
         Text(
             buildAnnotatedString {
                 withStyle(style = ParagraphStyle(lineHeight = 30.sp)) {
@@ -239,7 +206,6 @@ fun OurProductsWithSearch() {
                     ) {
                         append("Products")
                     }
-
                 }
             }
         )
@@ -255,7 +221,7 @@ fun OurProductsWithSearch() {
             Search(
                 modifier = Modifier.weight(1f)
             ) {
-                search = it
+                uiEvent.onSearch(it)
             }
             Spacer(modifier = Modifier.width(5.dp))
             Card(
@@ -276,62 +242,46 @@ fun OurProductsWithSearch() {
 
                 }
             }
-
         }
-
     }
 }
 
 @Composable
-fun ProductCategory() {
-    val itemList = listOf("Sneakers", "Jacket", "Watch", "Watch")
-    val categoryImagesList = listOf<Int>(
-        R.drawable.shoe_thumb_2,
-        R.drawable.jacket,
-        R.drawable.watch,
-        R.drawable.watch
-    )
+fun ProductCategory(
+    modifier: Modifier = Modifier,
+    category: List<String>? = null,
+    uiEvent: HomeUIEvent
+) {
+    var isSelect by remember { mutableIntStateOf(-1) }
+
     LazyRow(
-        modifier = Modifier
-            .fillMaxWidth()
+        modifier = modifier.fillMaxWidth()
     ) {
-        items(itemList.size) { item ->
+        itemsIndexed(category ?: emptyList()) { index, item ->
+
+            if (index != 0) Spacer(Modifier.width(10.dp))
+
             Box(
                 modifier = Modifier
+                    .clip(RoundedCornerShape(10.dp))
+                    .clickable {
+                        isSelect = index
+                        uiEvent.onCategory(item)
+                    }
                     .height(40.dp)
                     .border(
-                        color = if (item == 0) orange else lightGrey,
+                        color = if (index == isSelect) orange else lightGrey,
                         width = 2.dp,
                         shape = RoundedCornerShape(10.dp)
                     )
+                    .padding(horizontal = 10.dp),
+                contentAlignment = Alignment.Center
             ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 2.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    Image(
-                        painter = painterResource(categoryImagesList[item]),
-                        contentDescription = "",
-                        modifier = Modifier.size(30.dp, 30.dp)
-                    )
-                    Text(
-                        modifier = Modifier
-                            .padding(
-                                start = 5.dp,
-                                end = 16.dp,
-                                top = 8.dp,
-                                bottom = 8.dp
-                            ),
-                        text = itemList[item],
-                        color = if (item == 0) lightblack else Color.LightGray
-                    )
-                }
-
+                Text(
+                    text = item,
+                    color = if (index == isSelect) orange else Color.LightGray
+                )
             }
-            Spacer(modifier = Modifier.width(10.dp))
         }
     }
 }
@@ -339,7 +289,7 @@ fun ProductCategory() {
 @Composable
 fun ProductWidget(
     modifier: Modifier = Modifier,
-    data: ProductResponse? = null,
+    product: List<ProductDetails>? = null,
     uiEvent: HomeUIEvent,
 ) {
     LazyRow(
@@ -349,7 +299,7 @@ fun ProductWidget(
         contentPadding = PaddingValues(horizontal = 5.dp),
         horizontalArrangement = Arrangement.spacedBy(20.dp)
     ) {
-        items(data?.products ?: emptyList()) { item ->
+        items(product ?: emptyList()) { item ->
             Card(
                 modifier = Modifier
                     .width(180.dp)
@@ -385,11 +335,13 @@ fun ProductWidget(
                         Image(
                             modifier = Modifier
                                 .size(100.dp),
+                            contentScale = ContentScale.FillBounds,
                             contentDescription = "",
                             painter = rememberAsyncImagePainter(
                                 ImageRequest.Builder(LocalContext.current)
                                     .data(data = item.thumbnail ?: "")
                                     .error(R.drawable.no_thumbnail)
+                                    .placeholder(R.drawable.loading)
                                     .apply { crossfade(true) }
                                     .build()
                             )
@@ -458,6 +410,10 @@ fun ProductWidget(
 private fun HomePreview() {
     AppTheme {
         HomeContent(
+            uiState = HomeUIState(
+                category = listOf("Category 1", "Category 2"),
+                product = listOf(ProductDetails()),
+            ),
             uiEvent = HomeUIEvent()
         )
     }

@@ -55,6 +55,7 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.pascal.ecommercecompose.R
+import com.pascal.ecommercecompose.domain.model.dummy.DataDummy.product
 import com.pascal.ecommercecompose.domain.model.dummy.Product
 import com.pascal.ecommercecompose.ui.component.dialog.ShowDialog
 import com.pascal.ecommercecompose.ui.component.screenUtils.LoadingScreen
@@ -78,7 +79,7 @@ import org.koin.androidx.compose.koinViewModel
 fun DetailScreen(
     modifier: Modifier = Modifier,
     paddingValues: PaddingValues,
-    product: Product? = null,
+    productId: String? = "",
     viewModel: DetailViewModel = koinViewModel(),
     onNavBack: () -> Unit
 ) {

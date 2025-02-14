@@ -21,11 +21,11 @@ class HomeViewModel(
         _uiState.update { it.copy(isLoading = true) }
 
         try {
-            val result = repository.getProducts()
+            val result = repository.getProducts().products
             _uiState.update {
                 it.copy(
                     isLoading = false,
-                    data = result
+                    product = result
                 )
             }
         } catch (e: Exception) {
@@ -36,6 +36,62 @@ class HomeViewModel(
                     message = e.message.toString()
                 )
             }
+        }
+    }
+
+    suspend fun loadProductsByCategory(name: String) {
+        _uiState.update { it.copy(isLoading = true) }
+
+        try {
+            val result = repository.getProductByCategory(name).products
+            _uiState.update {
+                it.copy(
+                    isLoading = false,
+                    product = result
+                )
+            }
+        } catch (e: Exception) {
+            _uiState.update {
+                it.copy(
+                    isLoading = false,
+                    isError = true,
+                    message = e.message.toString()
+                )
+            }
+        }
+    }
+
+    suspend fun loadCategory() {
+        _uiState.update { it.copy(isLoading = true) }
+
+        try {
+            val result = repository.getCategories()
+            _uiState.update {
+                it.copy(
+                    isLoading = false,
+                    category = result
+                )
+            }
+        } catch (e: Exception) {
+            _uiState.update {
+                it.copy(
+                    isLoading = false,
+                    isError = true,
+                    message = e.message.toString()
+                )
+            }
+        }
+    }
+
+    fun searchProduct(name: String) {
+        val result = _uiState.value.product?.filter { product ->
+            product.title?.contains(name, ignoreCase = true) ?: false
+        }
+
+        _uiState.update {
+            it.copy(
+                product = result
+            )
         }
     }
 

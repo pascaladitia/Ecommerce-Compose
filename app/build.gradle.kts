@@ -126,7 +126,6 @@ dependencies {
     implementation(libs.coil.gif)
     implementation(libs.accompanist.flowlayout)
     implementation(libs.accompanist.permissions)
-    implementation(libs.accompanist.swiperefresh)
     implementation(libs.accompanist.pager)
     implementation(libs.feather.icons)
 
