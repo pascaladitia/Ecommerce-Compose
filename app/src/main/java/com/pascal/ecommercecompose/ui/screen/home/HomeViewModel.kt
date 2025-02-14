@@ -1,11 +1,16 @@
 package com.pascal.ecommercecompose.ui.screen.home
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
+import com.pascal.ecommercecompose.data.local.entity.ProductEntity
 import com.pascal.ecommercecompose.data.local.repository.LocalRepository
 import com.pascal.ecommercecompose.data.repository.Repository
+import com.pascal.ecommercecompose.domain.model.product.ProductDetails
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.withContext
 import org.koin.android.annotation.KoinViewModel
 
 @KoinViewModel
@@ -18,14 +23,20 @@ class HomeViewModel(
     val uiState get() = _uiState.asStateFlow()
 
     suspend fun loadProducts() {
-        _uiState.update { it.copy(isLoading = true) }
+        _uiState.update { it.copy(isLoading = true, product = emptyList()) }
 
         try {
-            val result = repository.getProducts().products
+            val favDb = loadFavorite().orEmpty()
+            val result = repository.getProducts().products.orEmpty()
+
+            val product = withContext(Dispatchers.Default) {
+                result.map { it.copy(isFavorite = favDb.any { favId -> favId == it.id }) }
+            }
+
             _uiState.update {
                 it.copy(
                     isLoading = false,
-                    product = result
+                    product = product
                 )
             }
         } catch (e: Exception) {
@@ -33,21 +44,28 @@ class HomeViewModel(
                 it.copy(
                     isLoading = false,
                     isError = true,
-                    message = e.message.toString()
+                    message = e.message.orEmpty()
                 )
             }
         }
     }
 
+
     suspend fun loadProductsByCategory(name: String) {
-        _uiState.update { it.copy(isLoading = true) }
+        _uiState.update { it.copy(isLoading = true, product = emptyList()) }
 
         try {
-            val result = repository.getProductByCategory(name).products
+            val favDb = loadFavorite().orEmpty()
+            val result = repository.getProductByCategory(name).products.orEmpty()
+
+            val product = withContext(Dispatchers.Default) {
+                result.map { it.copy(isFavorite = favDb.any { favId -> favId == it.id }) }
+            }
+
             _uiState.update {
                 it.copy(
                     isLoading = false,
-                    product = result
+                    product = product
                 )
             }
         } catch (e: Exception) {
@@ -95,6 +113,37 @@ class HomeViewModel(
         }
     }
 
+    private suspend fun loadFavorite(): List<Int>? {
+        try {
+            return database.getAllCart().map { it.id.toInt() }
+        } catch (e: Exception) {
+           Log.e("Tag Favorite", e.message.toString())
+            return null
+        }
+    }
+
+    suspend fun saveFavorite(isFav: Boolean, product: ProductDetails?) {
+        try {
+            val entity = ProductEntity(
+                id = product?.id?.toLong() ?: 0L,
+                name = product?.title,
+                price = product?.price,
+                imageID = product?.thumbnail,
+                category = product?.category,
+                description = product?.description,
+                qty = 1
+            )
+
+            if (isFav) {
+                database.insertFavorite(entity)
+            } else {
+                database.deleteFavoriteById(entity)
+            }
+        } catch (e: Exception) {
+            Log.e("Tag Favorite", e.message.toString())
+        }
+    }
+
     fun setError(boolean: Boolean) {
         _uiState.update { it.copy(isError = boolean) }
     }
@@ -104,7 +153,8 @@ class HomeViewModel(
         _uiState.update {
             it.copy(
                 isLoading = false,
-                isError = false
+                isError = false,
+                product = emptyList()
             )
         }
     }

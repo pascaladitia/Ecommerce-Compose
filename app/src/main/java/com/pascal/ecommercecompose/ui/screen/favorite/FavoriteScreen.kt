@@ -1,8 +1,7 @@
-package com.pascal.ecommercecompose.ui.screen.home
+package com.pascal.ecommercecompose.ui.screen.favorite
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -12,19 +11,18 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
@@ -38,7 +36,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -49,8 +46,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.ParagraphStyle
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -65,13 +60,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.pascal.ecommercecompose.R
+import com.pascal.ecommercecompose.data.local.entity.ProductEntity
 import com.pascal.ecommercecompose.data.prefs.PreferencesLogin
-import com.pascal.ecommercecompose.domain.model.product.ProductDetails
 import com.pascal.ecommercecompose.domain.model.user.User
-import com.pascal.ecommercecompose.ui.component.dialog.ShowDialog
-import com.pascal.ecommercecompose.ui.component.form.Search
-import com.pascal.ecommercecompose.ui.component.screenUtils.LoadingScreen
-import com.pascal.ecommercecompose.ui.component.screenUtils.PullRefreshComponent
 import com.pascal.ecommercecompose.ui.component.screenUtils.TopAppBarHeader
 import com.pascal.ecommercecompose.ui.theme.AppTheme
 import com.pascal.ecommercecompose.ui.theme.lightGrey
@@ -79,119 +70,80 @@ import com.pascal.ecommercecompose.ui.theme.lightorange
 import com.pascal.ecommercecompose.ui.theme.orange
 import com.pascal.ecommercecompose.ui.theme.subTitleTextColor
 import com.pascal.ecommercecompose.ui.theme.titleTextColor
-import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun HomeScreen(
+fun FavoriteScreen(
     modifier: Modifier = Modifier,
     paddingValues: PaddingValues,
-    viewModel: HomeViewModel = koinViewModel(),
-    onDetail: (String?) -> Unit
+    viewModel: FavoriteViewModel = koinViewModel(),
+    onDetail: (ProductEntity?) -> Unit
 ) {
     val context = LocalContext.current
-    val coroutine = rememberCoroutineScope()
     val pref = PreferencesLogin.getLoginResponse(context)
-
+    val coroutine = rememberCoroutineScope()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
-        viewModel.loadProducts()
-        viewModel.loadCategory()
+        viewModel.loadFavorite()
     }
 
     Surface(
         modifier = modifier.padding(paddingValues),
         color = MaterialTheme.colorScheme.background
     ) {
-        if (uiState.isLoading) LoadingScreen()
+        FavoriteContent(
+            user = pref,
+            uiState = uiState,
+            uiEvent = FavoriteUIEvent(
+                onDetail = {
 
-        if (uiState.isError) {
-            ShowDialog(
-                message = uiState.message,
-                textButton = stringResource(R.string.close)
-            ) {
-                viewModel.setError(false)
-            }
-        }
+                },
+                onDelete = {
 
-        PullRefreshComponent(
-            onRefresh = {
-                viewModel.loadProducts()
-            }
-        ) {
-            HomeContent(
-                user = pref,
-                uiState = uiState,
-                uiEvent = HomeUIEvent(
-                    onSearch = {
-                        viewModel.searchProduct(it)
-                    },
-                    onCategory = {
-                        coroutine.launch {
-                            viewModel.loadProductsByCategory(it)
-                        }
-                    },
-                    onFavorite = { isFav, item ->
-                        coroutine.launch {
-                            viewModel.saveFavorite(isFav, item)
-                        }
-                    },
-                    onDetail = {
-                        onDetail(it?.id.toString())
-                    }
-                )
+                }
             )
-        }
+        )
     }
 }
 
 @Composable
-fun HomeContent(
-    modifier: Modifier = Modifier,
+fun FavoriteContent(
     user: User? = null,
-    uiState: HomeUIState,
-    uiEvent: HomeUIEvent,
+    uiState: FavoriteUIState,
+    uiEvent: FavoriteUIEvent
 ) {
     Box(
-        modifier = modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize()
     ) {
         Column(
-            modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 20.dp)
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(20.dp)
         ) {
-
             TopAppBarHeader(user = user)
-
-            Spacer(modifier = Modifier.padding(10.dp))
-
-            OurProductsWithSearch(uiEvent = uiEvent)
-
-            Spacer(modifier = Modifier.padding(16.dp))
-
-            ProductCategory(
-                category = uiState.category,
-                uiEvent = uiEvent
-            )
-
-            Spacer(modifier = Modifier.padding(16.dp))
-
-            ProductWidget(
+            Spacer(modifier = Modifier.padding(5.dp))
+            DeleteFavorite(uiEvent = uiEvent)
+            Spacer(modifier = Modifier.padding(20.dp))
+            FavoriteItemList(
                 uiState = uiState,
                 uiEvent = uiEvent
             )
+            Spacer(modifier = Modifier.padding(20.dp))
         }
     }
 }
 
+
 @Composable
-fun OurProductsWithSearch(
+fun DeleteFavorite(
     modifier: Modifier = Modifier,
-    uiEvent: HomeUIEvent
+    uiEvent: FavoriteUIEvent
 ) {
-    Column(
-        modifier = modifier
-            .fillMaxWidth(),
-        verticalArrangement = Arrangement.Top
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
             buildAnnotatedString {
@@ -202,7 +154,7 @@ fun OurProductsWithSearch(
                             fontSize = 24.sp
                         )
                     ) {
-                        append("Our\n")
+                        append("Shopping\n")
                     }
                     withStyle(
                         style = SpanStyle(
@@ -211,93 +163,20 @@ fun OurProductsWithSearch(
                             fontSize = 24.sp
                         )
                     ) {
-                        append("Products")
+                        append("Favorite")
                     }
+
                 }
             }
         )
-
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Start,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(78.dp)
-                .padding(top = 30.dp)
-        ) {
-            Search(
-                modifier = Modifier.weight(1f)
-            ) {
-                uiEvent.onSearch(it)
-            }
-            Spacer(modifier = Modifier.width(5.dp))
-            Card(
-                modifier = Modifier
-                    .width(60.dp)
-                    .padding(start = 16.dp)
-                    .clickable { },
-                elevation = CardDefaults.cardElevation(6.dp),
-                shape = RoundedCornerShape(12.dp),
-                colors =  CardDefaults.cardColors(Color.White)
-            ) {
-                IconButton(onClick = { }) {
-                    Icon(
-                        painter = painterResource(R.drawable.filter_list),
-                        contentDescription = "Filter Icon",
-                        modifier = Modifier.size(20.dp, 20.dp)
-                    )
-
-                }
-            }
-        }
     }
 }
 
 @Composable
-fun ProductCategory(
+fun FavoriteItemList(
     modifier: Modifier = Modifier,
-    category: List<String>? = null,
-    uiEvent: HomeUIEvent
-) {
-    var isSelect by remember { mutableIntStateOf(-1) }
-
-    LazyRow(
-        modifier = modifier.fillMaxWidth()
-    ) {
-        itemsIndexed(category ?: emptyList()) { index, item ->
-
-            if (index != 0) Spacer(Modifier.width(10.dp))
-
-            Box(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(10.dp))
-                    .clickable {
-                        isSelect = index
-                        uiEvent.onCategory(item)
-                    }
-                    .height(40.dp)
-                    .border(
-                        color = if (index == isSelect) orange else lightGrey,
-                        width = 2.dp,
-                        shape = RoundedCornerShape(10.dp)
-                    )
-                    .padding(horizontal = 10.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = item,
-                    color = if (index == isSelect) orange else Color.LightGray
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun ProductWidget(
-    modifier: Modifier = Modifier,
-    uiState: HomeUIState,
-    uiEvent: HomeUIEvent,
+    uiState: FavoriteUIState,
+    uiEvent: FavoriteUIEvent,
 ) {
     LazyVerticalGrid(
         modifier = modifier
@@ -309,7 +188,7 @@ fun ProductWidget(
     ) {
         items(uiState.product ?: emptyList()) { item ->
 
-            var isFavorite by remember { mutableStateOf(item.isFavorite ?: false) }
+            var isFavorite by remember { mutableStateOf(true) }
 
             Card(
                 modifier = Modifier
@@ -317,7 +196,7 @@ fun ProductWidget(
                     .wrapContentHeight(),
                 shape = RoundedCornerShape(24.dp),
                 elevation = CardDefaults.cardElevation(2.dp),
-                colors =  CardDefaults.cardColors(Color.White)
+                colors = CardDefaults.cardColors(Color.White)
             ) {
                 Column(
                     modifier = Modifier
@@ -329,7 +208,7 @@ fun ProductWidget(
                 ) {
                     IconButton(onClick = {
                         isFavorite = !isFavorite
-                        uiEvent.onFavorite(isFavorite, item)
+                        uiEvent.onDelete(item)
                     }) {
                         Icon(
                             imageVector = if (isFavorite) Icons.Filled.Favorite
@@ -354,7 +233,7 @@ fun ProductWidget(
                             contentDescription = "",
                             painter = rememberAsyncImagePainter(
                                 ImageRequest.Builder(LocalContext.current)
-                                    .data(data = item.thumbnail ?: "")
+                                    .data(data = item.imageID ?: "")
                                     .error(R.drawable.no_thumbnail)
                                     .placeholder(R.drawable.loading)
                                     .apply { crossfade(true) }
@@ -372,7 +251,7 @@ fun ProductWidget(
                     ) {
 
                         Text(
-                            text = item.title ?: "No Title",
+                            text = item.name ?: "No Title",
                             fontWeight = FontWeight.Bold,
                             fontSize = 16.sp,
                             color = titleTextColor,
@@ -422,14 +301,13 @@ fun ProductWidget(
 
 @Preview(showBackground = true)
 @Composable
-private fun HomePreview() {
+private fun FavoritePreview() {
     AppTheme {
-        HomeContent(
-            uiState = HomeUIState(
-                category = listOf("Category 1", "Category 2"),
-                product = listOf(ProductDetails(), ProductDetails(), ProductDetails()),
+        FavoriteContent(
+            uiState = FavoriteUIState(
+                product = listOf(ProductEntity(), ProductEntity())
             ),
-            uiEvent = HomeUIEvent()
+            uiEvent = FavoriteUIEvent()
         )
     }
 }

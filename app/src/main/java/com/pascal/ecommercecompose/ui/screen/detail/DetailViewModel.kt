@@ -1,6 +1,7 @@
 package com.pascal.ecommercecompose.ui.screen.detail
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.pascal.ecommercecompose.data.local.entity.ProductEntity
 import com.pascal.ecommercecompose.data.local.repository.LocalRepository
@@ -20,13 +21,17 @@ class DetailViewModel(
     val uiState get() = _uiState.asStateFlow()
 
     suspend fun loadProductsDetail(id: String?) {
-        _uiState.update { it.copy(isLoading = true) }
+        _uiState.update { it.copy(isLoading = true, product = null) }
 
         try {
+            val favDb = loadFavorite().orEmpty()
+
             val result = repository.getProductById(id?.toIntOrNull() ?: 0)
+
             _uiState.update {
                 it.copy(
                     isLoading = false,
+                    isFavorite = result.id in favDb,
                     product = result
                 )
             }
@@ -35,7 +40,7 @@ class DetailViewModel(
                 it.copy(
                     isLoading = false,
                     isError = true,
-                    message = e.message.toString()
+                    message = e.message.orEmpty()
                 )
             }
         }
@@ -98,6 +103,37 @@ class DetailViewModel(
             }
 
             showToast(context, e.message.toString())
+        }
+    }
+
+    private suspend fun loadFavorite(): List<Int>? {
+        try {
+            return database.getAllCart().map { it.id.toInt() }
+        } catch (e: Exception) {
+            Log.e("Tag Favorite", e.message.toString())
+            return null
+        }
+    }
+
+    suspend fun saveFavorite(isFav: Boolean, product: ProductDetails?) {
+        try {
+            val entity = ProductEntity(
+                id = product?.id?.toLong() ?: 0L,
+                name = product?.title,
+                price = product?.price,
+                imageID = product?.thumbnail,
+                category = product?.category,
+                description = product?.description,
+                qty = 1
+            )
+
+            if (isFav) {
+                database.insertFavorite(entity)
+            } else {
+                database.deleteFavoriteById(entity)
+            }
+        } catch (e: Exception) {
+            Log.e("Tag Favorite", e.message.toString())
         }
     }
 

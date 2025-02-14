@@ -3,6 +3,8 @@ package com.pascal.ecommercecompose.ui.navigation
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -42,6 +44,11 @@ fun BottomBar(
                     title = "Home",
                     icon = FeatherIcons.Home,
                     screen = Screen.HomeScreen
+                ),
+                NavigationItem(
+                    title = "Favorite",
+                    icon = Icons.Outlined.FavoriteBorder,
+                    screen = Screen.FavoriteScreen
                 ),
                 NavigationItem(
                     title = "Cart",

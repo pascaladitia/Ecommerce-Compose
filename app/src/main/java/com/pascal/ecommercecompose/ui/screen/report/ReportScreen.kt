@@ -40,6 +40,7 @@ import com.pascal.ecommercecompose.data.prefs.PreferencesLogin
 import com.pascal.ecommercecompose.ui.component.button.ButtonComponent
 import com.pascal.ecommercecompose.ui.component.screenUtils.CardComponent
 import com.pascal.ecommercecompose.ui.theme.AppTheme
+import com.pascal.ecommercecompose.utils.calculateTotalPrice
 import compose.icons.FeatherIcons
 import compose.icons.feathericons.ChevronLeft
 import compose.icons.feathericons.Download
@@ -187,7 +188,7 @@ fun ReportContent(
 
             ReportItemText(
                 title = "Total Amount",
-                value = "${product!!.sumOf { it.price?.times(it.qty ?: 0) ?: 0.0 }}"
+                value = calculateTotalPrice(product ?: emptyList())
             )
 
             Spacer(Modifier.width(32.dp))

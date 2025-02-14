@@ -7,11 +7,12 @@ data class HomeUIState(
     val isError: Boolean = false,
     val message: String = "",
     val product: List<ProductDetails>? = null,
-    val category: List<String>? = null
+    val category: List<String>? = null,
 )
 
 data class HomeUIEvent(
     val onSearch: (String) -> Unit = {},
     val onCategory: (String) -> Unit = {},
+    val onFavorite: (Boolean, ProductDetails?) -> Unit = { _, _ ->},
     val onDetail: (ProductDetails?) -> Unit = {}
 )

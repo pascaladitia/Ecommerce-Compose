@@ -13,6 +13,7 @@ import androidx.navigation.compose.rememberNavController
 import com.pascal.ecommercecompose.data.prefs.PreferencesLogin
 import com.pascal.ecommercecompose.ui.screen.cart.CartScreen
 import com.pascal.ecommercecompose.ui.screen.detail.DetailScreen
+import com.pascal.ecommercecompose.ui.screen.favorite.FavoriteScreen
 import com.pascal.ecommercecompose.ui.screen.home.HomeScreen
 import com.pascal.ecommercecompose.ui.screen.login.LoginScreen
 import com.pascal.ecommercecompose.ui.screen.profile.ProfileScreen
@@ -35,6 +36,7 @@ fun RouteScreen(
         bottomBar = {
             if (currentRoute in listOf(
                     Screen.HomeScreen.route,
+                    Screen.FavoriteScreen.route,
                     Screen.CartScreen.route,
                     Screen.ProfileScreen.route
                 )) {
@@ -100,6 +102,14 @@ fun RouteScreen(
                     onFinish = {
                         saveToCurrentBackStack(navController, "cart", it)
                         navController.navigate(Screen.ReportScreen.route)
+                    }
+                )
+            }
+            composable(route = Screen.FavoriteScreen.route) {
+                FavoriteScreen (
+                    paddingValues = paddingValues,
+                    onDetail = {
+                        navController.navigate(Screen.DetailScreen.createRoute(it?.id.toString()))
                     }
                 )
             }

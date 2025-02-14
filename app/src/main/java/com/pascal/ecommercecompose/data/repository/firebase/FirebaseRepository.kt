@@ -8,6 +8,7 @@ import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.FirebaseFirestore
 import com.pascal.ecommercecompose.data.local.entity.ProductEntity
 import com.pascal.ecommercecompose.domain.base.Resource
+import com.pascal.ecommercecompose.utils.calculateTotalPrice
 import kotlinx.coroutines.tasks.await
 
 class FirebaseRepository(
@@ -60,7 +61,7 @@ class FirebaseRepository(
         return try {
             val transactionData = hashMapOf(
                 "date" to System.currentTimeMillis(),
-                "totalAmount" to products!!.sumOf { it.price?.times(it.qty ?: 0) ?: 0.0 }
+                "totalAmount" to calculateTotalPrice(products ?: emptyList())
             )
 
             val transactionRef = firestore.collection("transactions").add(transactionData).await()
@@ -68,7 +69,7 @@ class FirebaseRepository(
 
             val batch = firestore.batch()
 
-            for (product in products) {
+            for (product in products ?: emptyList()) {
                 val productRef = transactionRef.collection("products").document()
                 val productData = hashMapOf(
                     "name" to product.name,

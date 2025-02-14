@@ -1,6 +1,7 @@
 package com.pascal.ecommercecompose.ui.screen.detail
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -60,7 +61,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.pascal.ecommercecompose.R
-import com.pascal.ecommercecompose.domain.model.dummy.DataDummy.product
 import com.pascal.ecommercecompose.domain.model.product.ProductDetails
 import com.pascal.ecommercecompose.domain.model.product.Review
 import com.pascal.ecommercecompose.ui.component.dialog.ShowDialog
@@ -111,11 +111,16 @@ fun DetailScreen(
         }
 
         DetailContent(
-            product = uiState.product,
+            uiState = uiState,
             uiEvent = DetailUIEvent(
                 onCart = {
                     coroutine.launch {
                         viewModel.getCart(context, it)
+                    }
+                },
+                onFavorite = { isFav, item ->
+                    coroutine.launch {
+                        viewModel.saveFavorite(isFav, item)
                     }
                 },
                 onNavBack = {
@@ -130,22 +135,29 @@ fun DetailScreen(
 @Composable
 fun DetailContent(
     modifier: Modifier = Modifier,
-    product: ProductDetails? = null,
+    uiState: DetailUIState,
     uiEvent: DetailUIEvent
 ) {
+    var isFavorite by remember { mutableStateOf(uiState.product?.isFavorite ?: false) }
+
     Scaffold(
         modifier = modifier.fillMaxSize(),
         topBar = {
             TopAppBarWithBack(
+                isFavorite = isFavorite,
+                onFavorite = {
+                    isFavorite = !isFavorite
+                    uiEvent.onFavorite(isFavorite, uiState.product)
+                },
                 onBackClick = {
                     uiEvent.onNavBack()
-                },
+                }
             )
         },
         containerColor = lightgraybg,
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { uiEvent.onCart(product) },
+                onClick = { uiEvent.onCart(uiState.product) },
                 containerColor = orange
             ) {
                 Icon(
@@ -173,8 +185,11 @@ fun DetailContent(
                             bottom.linkTo(imagesliderref.top)
                             start.linkTo(parent.start)
                             end.linkTo(parent.end)
-                        }) {
-                        HeaderImagesSlider(product = product)
+                        }
+                    ) {
+                        HeaderImagesSlider(
+                            product = uiState.product
+                        )
                     }
 
                     Surface(
@@ -197,19 +212,19 @@ fun DetailContent(
                                 .fillMaxSize()
                                 .padding(30.dp)
                         ) {
-                            ProductTitle(product = product)
+                            ProductTitle(product = uiState.product)
 
                             Spacer(modifier = Modifier.padding(10.dp))
 
-                            ProductAvailableSize(product = product)
+                            ProductAvailableSize(product = uiState.product)
 
                             Spacer(modifier = Modifier.padding(10.dp))
 
-                            ProductItemColorWithDesc(product = product)
+                            ProductItemColorWithDesc(product = uiState.product)
 
                             Spacer(modifier = Modifier.padding(10.dp))
 
-                            ProductReviews(product = product)
+                            ProductReviews(product = uiState.product)
 
                             Spacer(modifier = Modifier.padding(30.dp))
                         }
@@ -492,10 +507,12 @@ fun ProductReviews(
 private fun DetailPreview() {
     AppTheme {
         DetailContent(
-            product = ProductDetails(
-                tags = listOf("Tags1", "Tags2"),
-                description = "Sample desc",
-                reviews = listOf(Review(), Review())
+            uiState = DetailUIState(
+                product = ProductDetails(
+                    tags = listOf("Tags1", "Tags2"),
+                    description = "Sample desc",
+                    reviews = listOf(Review(), Review())
+                )
             ),
             uiEvent = DetailUIEvent()
         )

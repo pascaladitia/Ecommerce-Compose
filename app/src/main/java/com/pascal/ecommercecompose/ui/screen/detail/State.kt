@@ -5,6 +5,7 @@ import com.pascal.ecommercecompose.domain.model.product.ProductDetails
 data class DetailUIState(
     val isLoading: Boolean = false,
     val isError: Boolean = false,
+    val isFavorite: Boolean = false,
     val message: String = "",
     val isSuccess: Boolean = false,
     val product: ProductDetails? = null
@@ -12,5 +13,6 @@ data class DetailUIState(
 
 data class DetailUIEvent(
     val onCart: (ProductDetails?) -> Unit = {},
+    val onFavorite: (Boolean, ProductDetails?) -> Unit = { _, _ ->},
     val onNavBack: () -> Unit = {},
 )

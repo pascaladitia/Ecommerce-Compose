@@ -27,6 +27,7 @@ import com.pascal.ecommercecompose.data.local.repository.LocalRepository
 import com.pascal.ecommercecompose.data.prefs.PreferencesLogin
 import com.pascal.ecommercecompose.data.repository.firebase.FirebaseRepository
 import com.pascal.ecommercecompose.domain.base.Resource
+import com.pascal.ecommercecompose.utils.calculateTotalPrice
 import com.pascal.ecommercecompose.utils.getCurrentFormattedDate
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -108,7 +109,7 @@ class ReportViewModel(
             }
 
             document.add(Paragraph("\nTotal Amount").setBold().setFontSize(14f))
-            document.add(Paragraph("${product!!.sumOf { it.price?.times(it.qty ?: 0) ?: 0.0 }}"))
+            document.add(Paragraph(calculateTotalPrice(product ?: emptyList())))
 
 
             document.close()

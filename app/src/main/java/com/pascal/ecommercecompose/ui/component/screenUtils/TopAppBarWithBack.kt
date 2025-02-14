@@ -7,7 +7,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.outlined.Favorite
+import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.KeyboardArrowLeft
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -24,6 +26,8 @@ import com.pascal.ecommercecompose.ui.theme.orange
 @Composable
 fun TopAppBarWithBack(
     modifier: Modifier = Modifier,
+    isFavorite: Boolean = false,
+    onFavorite: () -> Unit,
     onBackClick: () -> Unit
 ) {
     Row(
@@ -53,9 +57,10 @@ fun TopAppBarWithBack(
             elevation = CardDefaults.cardElevation(6.dp),
             colors =  CardDefaults.cardColors(Color.White)
         ) {
-            IconButton(onClick = { }) {
+            IconButton(onClick = { onFavorite() }) {
                 Icon(
-                    imageVector = Icons.Outlined.Favorite,
+                    imageVector = if (isFavorite) Icons.Filled.Favorite
+                    else Icons.Outlined.FavoriteBorder,
                     contentDescription = "",
                     tint = orange
                 )

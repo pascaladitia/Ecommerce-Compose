@@ -10,6 +10,7 @@ import android.provider.MediaStore
 import android.webkit.MimeTypeMap
 import android.widget.Toast
 import androidx.core.content.ContextCompat
+import com.pascal.ecommercecompose.data.local.entity.ProductEntity
 import com.pascal.ecommercecompose.utils.Constant.FORMAT_DATE
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody
@@ -33,29 +34,10 @@ fun getCurrentFormattedDate(): String {
     return dateFormat.format(currentDate)
 }
 
-fun reFormatDate(date: String?): Pair<String?, String?> {
-    if (date.isNullOrBlank()) {
-        return Pair("", "")
-    }
-
-    try {
-        val inputFormat = SimpleDateFormat(FORMAT_DATE, Locale.getDefault())
-        val outputFormatDateMonth = SimpleDateFormat("MMM dd", Locale.getDefault())
-        val outputFormatYear = SimpleDateFormat("yyyy", Locale.getDefault())
-
-        val dateObject = inputFormat.parse(date)
-
-        if (dateObject != null) {
-            val formattedDateMonth = outputFormatDateMonth.format(dateObject)
-            val formattedYear = outputFormatYear.format(dateObject)
-
-            return Pair(formattedDateMonth, formattedYear)
-        }
-    } catch (e: Exception) {
-        e.printStackTrace()
-    }
-
-    return Pair("", "")
+@SuppressLint("DefaultLocale")
+fun calculateTotalPrice(products: List<ProductEntity?>): String {
+    val total = products.sumOf { (it?.price ?: 0.0) * (it?.qty ?: 0) }
+    return String.format("%.2f", total)
 }
 
 fun intentActionView(context: Context, url: String) {

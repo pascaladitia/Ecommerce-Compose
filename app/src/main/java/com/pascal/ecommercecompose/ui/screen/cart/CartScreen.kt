@@ -68,6 +68,7 @@ import com.pascal.ecommercecompose.ui.theme.orange
 import com.pascal.ecommercecompose.ui.theme.subTitleTextColor
 import com.pascal.ecommercecompose.ui.theme.titleTextColor
 import com.pascal.ecommercecompose.ui.theme.white
+import com.pascal.ecommercecompose.utils.calculateTotalPrice
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
@@ -106,11 +107,7 @@ fun CartScreen(
                     onNext = {
                         listProduct = it
                         coroutine.launch {
-                            snapUrl = viewModel.createSnapTransaction(it.sumOf {
-                                it?.price?.times(
-                                    it.qty ?: 0
-                                ) ?: 0.0
-                            })
+                            snapUrl = viewModel.createSnapTransaction(calculateTotalPrice(it).toDouble())
                         }
                     }
                 )
@@ -348,7 +345,7 @@ fun NextButtonWithTotalItems(
             )
 
             Text(
-                text = "$${product.sumOf { it.price?.times(it.qty ?: 0) ?: 0.0 }}",
+                text = "$${calculateTotalPrice(product)}",
                 fontSize = 18.sp,
                 color = titleTextColor,
                 fontWeight = FontWeight.Bold
