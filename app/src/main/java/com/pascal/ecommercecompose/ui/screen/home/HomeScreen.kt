@@ -19,7 +19,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -147,11 +149,11 @@ fun HomeContent(
     uiEvent: HomeUIEvent,
 ) {
     Box(
-        modifier = modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
+        modifier = modifier.fillMaxSize()
     ) {
-        Column(modifier = Modifier.padding(30.dp)) {
+        Column(
+            modifier = Modifier.padding(start = 20.dp, end = 20.dp, top = 20.dp)
+        ) {
 
             TopAppBarHeader(user = user)
 
@@ -159,14 +161,14 @@ fun HomeContent(
 
             OurProductsWithSearch(uiEvent = uiEvent)
 
-            Spacer(modifier = Modifier.padding(20.dp))
+            Spacer(modifier = Modifier.padding(16.dp))
 
             ProductCategory(
                 category = uiState.category,
                 uiEvent = uiEvent
             )
 
-            Spacer(modifier = Modifier.padding(20.dp))
+            Spacer(modifier = Modifier.padding(16.dp))
 
             ProductWidget(
                 product = uiState.product,
@@ -292,11 +294,12 @@ fun ProductWidget(
     product: List<ProductDetails>? = null,
     uiEvent: HomeUIEvent,
 ) {
-    LazyRow(
+    LazyVerticalGrid(
         modifier = modifier
             .fillMaxWidth()
-            .wrapContentHeight(),
-        contentPadding = PaddingValues(horizontal = 5.dp),
+            .fillMaxSize(),
+        columns = GridCells.Fixed(2),
+        verticalArrangement = Arrangement.spacedBy(20.dp),
         horizontalArrangement = Arrangement.spacedBy(20.dp)
     ) {
         items(product ?: emptyList()) { item ->
@@ -412,7 +415,7 @@ private fun HomePreview() {
         HomeContent(
             uiState = HomeUIState(
                 category = listOf("Category 1", "Category 2"),
-                product = listOf(ProductDetails()),
+                product = listOf(ProductDetails(), ProductDetails(), ProductDetails()),
             ),
             uiEvent = HomeUIEvent()
         )
