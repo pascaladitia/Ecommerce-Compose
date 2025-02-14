@@ -27,7 +27,7 @@ fun CartPayment(
                         val url = request?.url.toString()
                         Log.d("Payment", "Loaded URL: $url")
 
-                        if (url.contains("https://simulator.sandbox.midtrans.com/v2/deeplink/detail?tref=")) {
+                        if (url.contains("https://simulator.sandbox.midtrans.com")) {
                             Toast.makeText(context, "Pembayaran Anda Sudah Selesai 🎉", Toast.LENGTH_LONG).show()
                             onFinish()
                             return true

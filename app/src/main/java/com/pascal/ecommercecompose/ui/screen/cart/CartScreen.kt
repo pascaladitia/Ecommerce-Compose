@@ -46,6 +46,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.pascal.ecommercecompose.data.local.entity.ProductEntity
+import com.pascal.ecommercecompose.data.prefs.PreferencesLogin
+import com.pascal.ecommercecompose.domain.model.user.User
 import com.pascal.ecommercecompose.ui.screen.cart.component.CartPayment
 import com.pascal.ecommercecompose.ui.screen.home.TopAppBarHeader
 import com.pascal.ecommercecompose.ui.theme.lightGrey
@@ -64,6 +66,7 @@ fun CartScreen(
     onFinish: (List<ProductEntity?>?) -> Unit
 ) {
     val context = LocalContext.current
+    val pref = PreferencesLogin.getLoginResponse(context)
     val coroutine = rememberCoroutineScope()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -107,6 +110,7 @@ fun CartScreen(
 
 @Composable
 fun CartContent(
+    user: User? = null,
     product: List<ProductEntity> = emptyList(),
     uiEvent: CartUIEvent
 ) {
@@ -120,7 +124,7 @@ fun CartContent(
                 .fillMaxSize()
                 .padding(30.dp)
         ) {
-            TopAppBarHeader()
+            TopAppBarHeader(user)
             Spacer(modifier = Modifier.padding(5.dp))
             DeleteCart(uiEvent = uiEvent)
             Spacer(modifier = Modifier.padding(20.dp))

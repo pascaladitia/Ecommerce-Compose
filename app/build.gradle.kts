@@ -39,7 +39,7 @@ android {
 
     productFlavors {
         create("dev") {
-            baseUrl = "sample_url"
+            baseUrl = "https://dummyjson.com"
             apiKey = "api-key"
             dimension = "environment"
             buildConfigField("String", "API_KEY", "\"" + apiKey + "\"")
@@ -47,7 +47,7 @@ android {
         }
 
         create("staging") {
-            baseUrl = "sample_url"
+            baseUrl = "https://dummyjson.com"
             apiKey = "api-key"
             dimension = "environment"
             buildConfigField("String", "API_KEY", "\"" + apiKey + "\"")
@@ -55,7 +55,7 @@ android {
         }
 
         create("prod") {
-            baseUrl = "sample_url"
+            baseUrl = "https://dummyjson.com"
             apiKey = "api-key"
             dimension = "environment"
             buildConfigField("String", "API_KEY", "\"" + apiKey + "\"")
@@ -160,13 +160,13 @@ dependencies {
     implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore)
     implementation(libs.play.services.auth)
-    implementation("com.google.mlkit:face-detection:16.0.7")
+    implementation(libs.face.detection)
 
     // Camera
-    implementation("androidx.camera:camera-camera2:1.4.1")
-    implementation("androidx.camera:camera-lifecycle:1.4.1")
-    implementation("androidx.camera:camera-view:1.4.1")
-    implementation("com.google.guava:guava:30.1-android")
+    implementation(libs.androidx.camera.camera2)
+    implementation(libs.androidx.camera.lifecycle)
+    implementation(libs.androidx.camera.view)
+    implementation(libs.guava)
 
     // PDF
     implementation(libs.itext7.core)

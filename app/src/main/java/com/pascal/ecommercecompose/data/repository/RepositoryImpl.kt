@@ -1,8 +1,11 @@
 package com.pascal.ecommercecompose.data.repository
 
-import com.pascal.ecommercecompose.domain.model.dashboard.ResponseDashboard
+import com.pascal.ecommercecompose.domain.model.product.ProductDetails
+import com.pascal.ecommercecompose.domain.model.product.ProductResponse
 
 interface RepositoryImpl {
-    suspend fun dashboard() : ResponseDashboard
-
+    suspend fun getProducts() : ProductResponse
+    suspend fun getProductByCategory(name: String) : ProductResponse
+    suspend fun getProductById(id: Int) : ProductDetails
+    suspend fun getCategories() : List<String>
 }

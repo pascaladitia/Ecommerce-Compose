@@ -3,7 +3,6 @@ package com.pascal.ecommercecompose.ui.screen.cart
 import androidx.lifecycle.ViewModel
 import com.pascal.ecommercecompose.data.local.repository.LocalRepository
 import com.pascal.ecommercecompose.data.repository.Repository
-import com.pascal.ecommercecompose.utils.Constant
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -73,7 +72,8 @@ class CartViewModel(
 
     suspend fun createSnapTransaction(amountInUSD: Double?): String? {
         return withContext(Dispatchers.IO) {
-            val authHeader = Credentials.basic(Constant.MIDTRANS_SERVER, "")
+            val serverKey = "SB-Mid-server-Cfh101fZVXbuQQ-3BYueglG-"
+            val authHeader = Credentials.basic(serverKey, "")
 
             val exchangeRate = getUsdToIdrRate()
             val amountInIDR = (amountInUSD ?: 0.0) * exchangeRate

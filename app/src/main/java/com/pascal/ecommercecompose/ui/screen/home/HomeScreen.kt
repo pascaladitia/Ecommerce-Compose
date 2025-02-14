@@ -35,9 +35,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -46,22 +48,30 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.ParagraphStyle
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.pascal.ecommercecompose.R
 import com.pascal.ecommercecompose.data.prefs.PreferencesLogin
 import com.pascal.ecommercecompose.domain.model.dummy.DataDummy.productList
 import com.pascal.ecommercecompose.domain.model.dummy.Product
+import com.pascal.ecommercecompose.domain.model.product.ProductResponse
+import com.pascal.ecommercecompose.domain.model.user.User
+import com.pascal.ecommercecompose.ui.component.dialog.ShowDialog
 import com.pascal.ecommercecompose.ui.component.form.Search
+import com.pascal.ecommercecompose.ui.component.screenUtils.LoadingScreen
 import com.pascal.ecommercecompose.ui.theme.AppTheme
 import com.pascal.ecommercecompose.ui.theme.lightGrey
 import com.pascal.ecommercecompose.ui.theme.lightblack
@@ -78,20 +88,49 @@ fun HomeScreen(
     viewModel: HomeViewModel = koinViewModel(),
     onDetail: (Product) -> Unit
 ) {
+    val context = LocalContext.current
+    val coroutine = rememberCoroutineScope()
+    val pref = PreferencesLogin.getLoginResponse(context)
+
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(Unit) {
+        viewModel.loadProducts()
+    }
+
     Surface(
         modifier = modifier.padding(paddingValues),
         color = MaterialTheme.colorScheme.background
     ) {
-        HomeContent {
-            onDetail(it)
+        if (uiState.isLoading) LoadingScreen()
+
+        if (uiState.isError) {
+            ShowDialog(
+                message = uiState.message,
+                textButton = stringResource(R.string.close)
+            ) {
+                viewModel.setError(false)
+            }
         }
+
+        HomeContent(
+            user = pref,
+            data = uiState.data,
+            uiEvent = HomeUIEvent(
+                onDetail = {
+
+                }
+            )
+        )
     }
 }
 
 @Composable
 fun HomeContent(
     modifier: Modifier = Modifier,
-    onDetail: (Product) -> Unit
+    user: User? = null,
+    data: ProductResponse? = null,
+    uiEvent: HomeUIEvent,
 ) {
     Box(
         modifier = modifier
@@ -99,24 +138,29 @@ fun HomeContent(
             .verticalScroll(rememberScrollState())
     ) {
         Column(modifier = Modifier.padding(30.dp)) {
-            TopAppBarHeader()
+
+            TopAppBarHeader(user)
+
             Spacer(modifier = Modifier.padding(10.dp))
+
             OurProductsWithSearch()
+
             Spacer(modifier = Modifier.padding(20.dp))
+
             ProductCategory()
+
             Spacer(modifier = Modifier.padding(20.dp))
-            ProductWidget() {
-                onDetail(it)
-            }
+
+            ProductWidget(
+                data = data,
+                uiEvent = uiEvent
+            )
         }
     }
 }
 
 @Composable
-fun TopAppBarHeader() {
-    val context = LocalContext.current
-    val pref = PreferencesLogin.getLoginResponse(context)
-
+fun TopAppBarHeader(user: User?) {
     Row(
         modifier = Modifier
             .fillMaxWidth(),
@@ -149,7 +193,7 @@ fun TopAppBarHeader() {
             Image(
                 painter = rememberAsyncImagePainter(
                     ImageRequest.Builder(LocalContext.current)
-                        .data(data = pref?.photo_url?.toUri())
+                        .data(data = user?.photo_url?.toUri())
                         .error(R.drawable.no_profile)
                         .apply { crossfade(true) }
                         .build()
@@ -295,10 +339,9 @@ fun ProductCategory() {
 @Composable
 fun ProductWidget(
     modifier: Modifier = Modifier,
-    onDetail: (Product) -> Unit
+    data: ProductResponse? = null,
+    uiEvent: HomeUIEvent,
 ) {
-    val productList = productList
-
     LazyRow(
         modifier = modifier
             .fillMaxWidth()
@@ -306,7 +349,7 @@ fun ProductWidget(
         contentPadding = PaddingValues(horizontal = 5.dp),
         horizontalArrangement = Arrangement.spacedBy(20.dp)
     ) {
-        items(productList) { item ->
+        items(data?.products ?: emptyList()) { item ->
             Card(
                 modifier = Modifier
                     .width(180.dp)
@@ -315,11 +358,10 @@ fun ProductWidget(
                 elevation = CardDefaults.cardElevation(2.dp),
                 colors =  CardDefaults.cardColors(Color.White)
             ) {
-
                 Column(
                     modifier = Modifier
                         .clip(RoundedCornerShape(24.dp))
-                        .clickable { onDetail(item) }
+                        .clickable { uiEvent.onDetail(item) }
                         .fillMaxWidth()
                         .wrapContentHeight()
                         .padding(12.dp)
@@ -330,7 +372,6 @@ fun ProductWidget(
                             contentDescription = "",
                             tint = lightGrey
                         )
-
                     }
 
                     Box(
@@ -344,8 +385,14 @@ fun ProductWidget(
                         Image(
                             modifier = Modifier
                                 .size(100.dp),
-                            painter = painterResource(item.imageID),
                             contentDescription = "",
+                            painter = rememberAsyncImagePainter(
+                                ImageRequest.Builder(LocalContext.current)
+                                    .data(data = item.thumbnail ?: "")
+                                    .error(R.drawable.no_thumbnail)
+                                    .apply { crossfade(true) }
+                                    .build()
+                            )
                         )
                     }
 
@@ -358,14 +405,17 @@ fun ProductWidget(
                     ) {
 
                         Text(
-                            text = item.name,
+                            text = item.title ?: "No Title",
                             fontWeight = FontWeight.Bold,
                             fontSize = 16.sp,
-                            color = titleTextColor
+                            color = titleTextColor,
+                            textAlign = TextAlign.Center,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
                         )
 
                         Text(
-                            text = item.category,
+                            text = item.category ?: "No Category",
                             fontWeight = FontWeight.Bold,
                             fontSize = 16.sp,
                             color = orange,
@@ -407,6 +457,8 @@ fun ProductWidget(
 @Composable
 private fun HomePreview() {
     AppTheme {
-        HomeContent() {}
+        HomeContent(
+            uiEvent = HomeUIEvent()
+        )
     }
 }
