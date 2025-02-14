@@ -8,11 +8,10 @@ import java.io.Serializable
 @kotlinx.serialization.Serializable
 data class ProductEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
-    val name: String,
-    val price: Double,
-    val isliked: Int,
-    val imageID: Int,
-    val category: String,
-    val description: String,
-    var qty: Int
+    val name: String? = null,
+    val price: Double? = null,
+    val imageID: String? = null,
+    val category: String? = null,
+    val description: String? = null,
+    var qty: Int? = null
 ) : Serializable

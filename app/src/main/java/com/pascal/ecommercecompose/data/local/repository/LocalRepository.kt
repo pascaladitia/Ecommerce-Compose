@@ -27,12 +27,54 @@ class LocalRepository(
         return database.profileDao().insertProfile(item)
     }
 
+    // Cart
+    override suspend fun getCartById(id: Long): ProductEntity? {
+        return database.cartDao().getCartById(id)
+    }
+
+    override suspend fun getAllCart(): List<ProductEntity> {
+        return database.cartDao().getAllCart()
+    }
+
+    override suspend fun deleteCartById(item: ProductEntity) {
+        return database.cartDao().deleteCart(item)
+    }
+
+    override suspend fun deleteCart() {
+        return database.cartDao().clearCart()
+    }
+
+    override suspend fun insertCart(item: ProductEntity) {
+        return database.cartDao().insertCart(item)
+    }
+
+    // Favorite
+    override suspend fun getFavoriteById(id: Long): ProductEntity? {
+        return database.favoriteDao().getFavoriteById(id)
+    }
+
+    override suspend fun getAllFavorite(): List<ProductEntity> {
+        return database.favoriteDao().getAllFavorites()
+    }
+
+    override suspend fun deleteFavoriteById(item: ProductEntity) {
+        return database.favoriteDao().deleteFavorite(item)
+    }
+
+    override suspend fun deleteFavorite() {
+        return database.favoriteDao().clearFavorite()
+    }
+
+    override suspend fun insertFavorite(item: ProductEntity) {
+        return database.favoriteDao().insertFavorite(item)
+    }
+
     // Product
     override suspend fun getProductById(id: Long): ProductEntity? {
         return database.productDao().getProductById(id)
     }
 
-    override suspend fun getAllProducts(): List<ProductEntity> {
+    override suspend fun getAllProduct(): List<ProductEntity> {
         return database.productDao().getAllProducts()
     }
 
@@ -47,4 +89,5 @@ class LocalRepository(
     override suspend fun insertProduct(item: ProductEntity) {
         return database.productDao().insertProduct(item)
     }
+    
 }

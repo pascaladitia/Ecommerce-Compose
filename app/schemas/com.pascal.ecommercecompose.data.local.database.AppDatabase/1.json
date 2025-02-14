@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "48124133a9fb3ec92544d1c55622dc29",
+    "identityHash": "10187a47822ca267a531f04c52ce8238",
     "entities": [
       {
         "tableName": "profiles",
@@ -54,7 +54,7 @@
       },
       {
         "tableName": "product",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `price` REAL NOT NULL, `isliked` INTEGER NOT NULL, `imageID` INTEGER NOT NULL, `category` TEXT NOT NULL, `description` TEXT NOT NULL, `qty` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT, `price` REAL, `imageID` TEXT, `category` TEXT, `description` TEXT, `qty` INTEGER)",
         "fields": [
           {
             "fieldPath": "id",
@@ -65,44 +65,32 @@
           {
             "fieldPath": "name",
             "columnName": "name",
-            "affinity": "TEXT",
-            "notNull": true
+            "affinity": "TEXT"
           },
           {
             "fieldPath": "price",
             "columnName": "price",
-            "affinity": "REAL",
-            "notNull": true
-          },
-          {
-            "fieldPath": "isliked",
-            "columnName": "isliked",
-            "affinity": "INTEGER",
-            "notNull": true
+            "affinity": "REAL"
           },
           {
             "fieldPath": "imageID",
             "columnName": "imageID",
-            "affinity": "INTEGER",
-            "notNull": true
+            "affinity": "TEXT"
           },
           {
             "fieldPath": "category",
             "columnName": "category",
-            "affinity": "TEXT",
-            "notNull": true
+            "affinity": "TEXT"
           },
           {
             "fieldPath": "description",
             "columnName": "description",
-            "affinity": "TEXT",
-            "notNull": true
+            "affinity": "TEXT"
           },
           {
             "fieldPath": "qty",
             "columnName": "qty",
-            "affinity": "INTEGER",
-            "notNull": true
+            "affinity": "INTEGER"
           }
         ],
         "primaryKey": {
@@ -115,7 +103,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '48124133a9fb3ec92544d1c55622dc29')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '10187a47822ca267a531f04c52ce8238')"
     ]
   }
 }

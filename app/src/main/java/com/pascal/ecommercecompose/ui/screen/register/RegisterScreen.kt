@@ -307,7 +307,7 @@ fun RegisterContent(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 ButtonComponent(
-                    text = "Log In"
+                    text = "Register"
                 ) {
                     if (name.isBlank()) {
                         isNameError = true

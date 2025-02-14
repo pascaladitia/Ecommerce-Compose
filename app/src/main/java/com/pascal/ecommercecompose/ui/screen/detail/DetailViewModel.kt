@@ -47,22 +47,21 @@ class DetailViewModel(
         try {
             val entity = ProductEntity(
                 id = product?.id?.toLong() ?: 0L,
-                name = product?.title ?: "",
-                price = product?.price ?: 0.0,
-                isliked = 0,
-                imageID = 0,
-                category = product?.category ?: "",
-                description = product?.description ?: "",
+                name = product?.title,
+                price = product?.price,
+                imageID = product?.thumbnail,
+                category = product?.category,
+                description = product?.description,
                 qty = 1
             )
 
-            val result = database.getProductById(product?.id?.toLong() ?: 0L)
+            val result = database.getCartById(product?.id?.toLong() ?: 0L)
 
             if (result == null) {
                 loadCart(context, entity)
             } else {
                 loadCart(context, result.apply {
-                        qty = result.qty + 1
+                        qty = result.qty?.plus(1)
                     }
                 )
             }
@@ -79,7 +78,7 @@ class DetailViewModel(
 
     suspend fun loadCart(context: Context, entity: ProductEntity) {
         try {
-            database.insertProduct(entity)
+            database.insertCart(entity)
             showToast(context, "Success Add to Cart")
 
             _uiState.update {

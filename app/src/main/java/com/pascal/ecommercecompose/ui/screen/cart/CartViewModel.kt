@@ -3,6 +3,7 @@ package com.pascal.ecommercecompose.ui.screen.cart
 import androidx.lifecycle.ViewModel
 import com.pascal.ecommercecompose.data.local.repository.LocalRepository
 import com.pascal.ecommercecompose.data.repository.Repository
+import com.pascal.ecommercecompose.utils.Constant
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -28,7 +29,7 @@ class CartViewModel(
         _uiState.update { it.copy(isLoading = true) }
 
         try {
-            val result = database.getAllProducts()
+            val result = database.getAllCart()
 
             _uiState.update {
                 it.copy(
@@ -51,7 +52,7 @@ class CartViewModel(
         _uiState.update { it.copy(isLoading = true) }
 
         try {
-            database.deleteProduct()
+            database.deleteCart()
 
             _uiState.update {
                 it.copy(
@@ -72,7 +73,7 @@ class CartViewModel(
 
     suspend fun createSnapTransaction(amountInUSD: Double?): String? {
         return withContext(Dispatchers.IO) {
-            val serverKey = "SB-Mid-server-Cfh101fZVXbuQQ-3BYueglG-"
+            val serverKey = Constant.MIDTRANS_SERVER
             val authHeader = Credentials.basic(serverKey, "")
 
             val exchangeRate = getUsdToIdrRate()
@@ -108,10 +109,10 @@ class CartViewModel(
         }
     }
 
-    suspend fun getUsdToIdrRate(): Double {
+    private suspend fun getUsdToIdrRate(): Double {
         return withContext(Dispatchers.IO) {
             try {
-                val url = "https://api.exchangerate-api.com/v4/latest/USD"
+                val url = Constant.USD_URL
                 val request = Request.Builder().url(url).get().build()
                 val response = OkHttpClient().newCall(request).execute()
 

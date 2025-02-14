@@ -173,7 +173,7 @@ fun ReportContent(
                 items(product ?: emptyList()) {
                     ReportItemText(
                         title = "Product name",
-                        value = it.name
+                        value = it.name ?: ""
                     )
 
                     ReportItemText(
@@ -187,7 +187,7 @@ fun ReportContent(
 
             ReportItemText(
                 title = "Total Amount",
-                value = "${product!!.sumOf { it.price * it.qty }}"
+                value = "${product!!.sumOf { it.price?.times(it.qty ?: 0) ?: 0.0 }}"
             )
 
             Spacer(Modifier.width(32.dp))

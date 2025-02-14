@@ -11,5 +11,7 @@ object Constant {
     const val BEARER = "Bearer "
     const val FORMAT_DATE = "yyyy-MM-dd"
 
+    const val USD_URL = "https://api.exchangerate-api.com/v4/latest/USD"
+    const val MIDTRANS_SERVER = "SB-Mid-server-Cfh101fZVXbuQQ-3BYueglG-"
     const val CLIENT_ID = "556845723199-1blna8ger265a578hccuvte5j9nv8q16.apps.googleusercontent.com"
 }

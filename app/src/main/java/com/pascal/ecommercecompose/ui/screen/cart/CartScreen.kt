@@ -53,6 +53,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
+import com.pascal.ecommercecompose.R
 import com.pascal.ecommercecompose.data.local.entity.ProductEntity
 import com.pascal.ecommercecompose.data.prefs.PreferencesLogin
 import com.pascal.ecommercecompose.domain.model.user.User
@@ -103,7 +106,11 @@ fun CartScreen(
                     onNext = {
                         listProduct = it
                         coroutine.launch {
-                            snapUrl = viewModel.createSnapTransaction(it.sumOf { it?.price?.times(it.qty) ?: 0.0 })
+                            snapUrl = viewModel.createSnapTransaction(it.sumOf {
+                                it?.price?.times(
+                                    it.qty ?: 0
+                                ) ?: 0.0
+                            })
                         }
                     }
                 )
@@ -132,7 +139,7 @@ fun CartContent(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(30.dp)
+                .padding(20.dp)
         ) {
             TopAppBarHeader(user = user)
             Spacer(modifier = Modifier.padding(5.dp))
@@ -210,8 +217,8 @@ fun CartItemList(
         items(product) {
             ProductCartItems(
                 modifier = Modifier,
-                imagePainter = painterResource(id = it.imageID),
-                title = it.name,
+                imagePainter = it.imageID ?: "",
+                title = it.name ?: "",
                 price = it.price.toString(),
                 pricetag = "$",
                 count = it.qty.toString(),
@@ -224,7 +231,7 @@ fun CartItemList(
 @Composable
 fun ProductCartItems(
     modifier: Modifier = Modifier,
-    imagePainter: Painter,
+    imagePainter: String = "",
     title: String = "",
     price: String = "",
     pricetag: String = "",
@@ -246,7 +253,14 @@ fun ProductCartItems(
             contentAlignment = Alignment.Center
         ) {
             Image(
-                painter = imagePainter,
+                painter = rememberAsyncImagePainter(
+                    ImageRequest.Builder(LocalContext.current)
+                        .data(data = imagePainter)
+                        .error(R.drawable.no_thumbnail)
+                        .placeholder(R.drawable.loading)
+                        .apply { crossfade(true) }
+                        .build()
+                ),
                 contentDescription = "",
                 modifier = Modifier.padding(8.dp),
             )
@@ -334,7 +348,7 @@ fun NextButtonWithTotalItems(
             )
 
             Text(
-                text = "$${product.sumOf { it.price * it.qty }}",
+                text = "$${product.sumOf { it.price?.times(it.qty ?: 0) ?: 0.0 }}",
                 fontSize = 18.sp,
                 color = titleTextColor,
                 fontWeight = FontWeight.Bold

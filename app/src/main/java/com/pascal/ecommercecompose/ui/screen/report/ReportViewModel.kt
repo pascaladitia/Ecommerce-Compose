@@ -58,7 +58,7 @@ class ReportViewModel(
 
     suspend fun deleteCart() {
         try {
-            database.deleteProduct()
+            database.deleteCart()
         } catch (e: Exception) {
             Log.e("tag report", e.message.toString())
         }
@@ -108,7 +108,7 @@ class ReportViewModel(
             }
 
             document.add(Paragraph("\nTotal Amount").setBold().setFontSize(14f))
-            document.add(Paragraph("${product!!.sumOf { it.price * it.qty }}"))
+            document.add(Paragraph("${product!!.sumOf { it.price?.times(it.qty ?: 0) ?: 0.0 }}"))
 
 
             document.close()

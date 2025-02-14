@@ -60,7 +60,7 @@ class FirebaseRepository(
         return try {
             val transactionData = hashMapOf(
                 "date" to System.currentTimeMillis(),
-                "totalAmount" to products!!.sumOf { it.price * it.qty }
+                "totalAmount" to products!!.sumOf { it.price?.times(it.qty ?: 0) ?: 0.0 }
             )
 
             val transactionRef = firestore.collection("transactions").add(transactionData).await()
@@ -76,7 +76,6 @@ class FirebaseRepository(
                     "qty" to product.qty,
                     "category" to product.category,
                     "description" to product.description,
-                    "isliked" to product.isliked,
                     "imageID" to product.imageID
                 )
                 batch.set(productRef, productData)
