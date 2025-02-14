@@ -41,9 +41,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.ParagraphStyle
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -56,7 +54,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.pascal.ecommercecompose.R
-import com.pascal.ecommercecompose.data.local.entity.ProductEntity
+import com.pascal.ecommercecompose.data.local.entity.CartEntity
 import com.pascal.ecommercecompose.data.prefs.PreferencesLogin
 import com.pascal.ecommercecompose.domain.model.user.User
 import com.pascal.ecommercecompose.ui.component.screenUtils.TopAppBarHeader
@@ -77,7 +75,7 @@ fun CartScreen(
     modifier: Modifier = Modifier,
     paddingValues: PaddingValues,
     viewModel: CartViewModel = koinViewModel(),
-    onFinish: (List<ProductEntity?>?) -> Unit
+    onFinish: (List<CartEntity?>?) -> Unit
 ) {
     val context = LocalContext.current
     val pref = PreferencesLogin.getLoginResponse(context)
@@ -85,7 +83,7 @@ fun CartScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     var snapUrl by remember { mutableStateOf<String?>(null) }
-    var listProduct by remember { mutableStateOf<List<ProductEntity?>?>(null) }
+    var listProduct by remember { mutableStateOf<List<CartEntity?>?>(null) }
 
     LaunchedEffect(Unit) {
         viewModel.getCart()
@@ -125,7 +123,7 @@ fun CartScreen(
 @Composable
 fun CartContent(
     user: User? = null,
-    product: List<ProductEntity> = emptyList(),
+    product: List<CartEntity> = emptyList(),
     uiEvent: CartUIEvent
 ) {
     Box(
@@ -202,7 +200,7 @@ fun DeleteCart(
 @Composable
 fun CartItemList(
     modifier: Modifier = Modifier,
-    product: List<ProductEntity>,
+    product: List<CartEntity>,
 ) {
     LazyColumn(
         modifier = modifier
@@ -327,7 +325,7 @@ fun ProductCartItems(
 @Composable
 fun NextButtonWithTotalItems(
     modifier: Modifier = Modifier,
-    product: List<ProductEntity>,
+    product: List<CartEntity>,
     uiEvent: CartUIEvent
 ) {
     Column(modifier = modifier.fillMaxWidth()) {

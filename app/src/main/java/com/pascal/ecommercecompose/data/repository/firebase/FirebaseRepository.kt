@@ -6,6 +6,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.FirebaseFirestore
+import com.pascal.ecommercecompose.data.local.entity.CartEntity
 import com.pascal.ecommercecompose.data.local.entity.ProductEntity
 import com.pascal.ecommercecompose.domain.base.Resource
 import com.pascal.ecommercecompose.utils.calculateTotalPrice
@@ -57,7 +58,7 @@ class FirebaseRepository(
     }
 
     // Firestore
-    suspend fun addTransaction(products: List<ProductEntity>?): Resource<String> {
+    suspend fun addTransaction(products: List<CartEntity>?): Resource<String> {
         return try {
             val transactionData = hashMapOf(
                 "date" to System.currentTimeMillis(),

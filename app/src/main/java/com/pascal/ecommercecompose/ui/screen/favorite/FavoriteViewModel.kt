@@ -2,7 +2,7 @@ package com.pascal.ecommercecompose.ui.screen.favorite
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
-import com.pascal.ecommercecompose.data.local.entity.ProductEntity
+import com.pascal.ecommercecompose.data.local.entity.FavoriteEntity
 import com.pascal.ecommercecompose.data.local.repository.LocalRepository
 import com.pascal.ecommercecompose.data.repository.Repository
 import com.pascal.ecommercecompose.domain.model.product.ProductDetails
@@ -21,7 +21,7 @@ class FavoriteViewModel(
     val uiState get() = _uiState.asStateFlow()
 
     suspend fun loadFavorite() {
-        _uiState.update { it.copy(isLoading = true) }
+        _uiState.update { it.copy(isLoading = true, product = null) }
 
         try {
             val result = database.getAllFavorite()
@@ -42,7 +42,7 @@ class FavoriteViewModel(
         }
     }
 
-    suspend fun delete(product: ProductEntity?) {
+    suspend fun delete(product: FavoriteEntity?) {
         try {
             product?.let {
                 database.deleteFavoriteById(it)

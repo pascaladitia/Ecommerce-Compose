@@ -35,7 +35,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.pascal.ecommercecompose.R
-import com.pascal.ecommercecompose.data.local.entity.ProductEntity
+import com.pascal.ecommercecompose.data.local.entity.CartEntity
 import com.pascal.ecommercecompose.data.prefs.PreferencesLogin
 import com.pascal.ecommercecompose.ui.component.button.ButtonComponent
 import com.pascal.ecommercecompose.ui.component.screenUtils.CardComponent
@@ -51,7 +51,7 @@ fun ReportScreen(
     modifier: Modifier = Modifier,
     paddingValues: PaddingValues,
     viewModel: ReportViewModel = koinViewModel(),
-    product: List<ProductEntity>? = null,
+    product: List<CartEntity>? = null,
     onNavBack: () -> Unit
 ) {
     val context = LocalContext.current
@@ -82,7 +82,7 @@ fun ReportScreen(
 @Composable
 fun ReportContent(
     modifier: Modifier = Modifier,
-    product: List<ProductEntity>? = emptyList(),
+    product: List<CartEntity>? = emptyList(),
     uiEvent: ReportUIEvent
 ) {
     val context = LocalContext.current

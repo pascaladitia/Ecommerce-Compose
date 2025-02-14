@@ -1,6 +1,6 @@
 package com.pascal.ecommercecompose.ui.screen.report
 
-import com.pascal.ecommercecompose.data.local.entity.ProductEntity
+import com.pascal.ecommercecompose.data.local.entity.CartEntity
 
 data class ReportUIState(
     val isLoading: Boolean = false,
@@ -10,6 +10,6 @@ data class ReportUIState(
 )
 
 data class ReportUIEvent(
-    val onDownload: (List<ProductEntity>?) -> Unit = {},
+    val onDownload: (List<CartEntity>?) -> Unit = {},
     val onNavBack: () -> Unit = {},
 )

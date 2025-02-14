@@ -6,11 +6,18 @@ import com.pascal.ecommercecompose.data.local.dao.CartDao
 import com.pascal.ecommercecompose.data.local.dao.FavoriteDao
 import com.pascal.ecommercecompose.data.local.dao.ProductDao
 import com.pascal.ecommercecompose.data.local.dao.ProfileDao
+import com.pascal.ecommercecompose.data.local.entity.CartEntity
+import com.pascal.ecommercecompose.data.local.entity.FavoriteEntity
 import com.pascal.ecommercecompose.data.local.entity.ProductEntity
 import com.pascal.ecommercecompose.data.local.entity.ProfileEntity
 
 @Database(
-    entities = [ProfileEntity::class, ProductEntity::class],
+    entities = [
+        ProfileEntity::class,
+        ProductEntity::class,
+        CartEntity::class,
+        FavoriteEntity::class
+    ],
     version = 1,
     exportSchema = true
 )

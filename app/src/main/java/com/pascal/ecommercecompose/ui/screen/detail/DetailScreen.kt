@@ -138,7 +138,11 @@ fun DetailContent(
     uiState: DetailUIState,
     uiEvent: DetailUIEvent
 ) {
-    var isFavorite by remember { mutableStateOf(uiState.product?.isFavorite ?: false) }
+    var isFavorite by remember { mutableStateOf(false) }
+
+    LaunchedEffect(uiState.product) {
+        isFavorite = uiState.product?.isFavorite ?: false
+    }
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -259,7 +263,7 @@ fun HeaderImagesSlider(
         Image(
             painter = rememberAsyncImagePainter(
                 ImageRequest.Builder(LocalContext.current)
-                    .data(data = product?.thumbnail ?: "")
+                    .data(data = showImage ?: "")
                     .error(R.drawable.no_thumbnail)
                     .placeholder(R.drawable.loading)
                     .apply { crossfade(true) }
@@ -290,12 +294,13 @@ fun HeaderImagesSlider(
                         .clickable {
                             isSelect = index
                             showImage = item
-                        }
+                        },
+                    contentAlignment = Alignment.Center
                 ) {
                     Image(
                         painter = rememberAsyncImagePainter(
                             ImageRequest.Builder(LocalContext.current)
-                                .data(data = showImage ?: "")
+                                .data(data = item)
                                 .placeholder(R.drawable.loading)
                                 .apply { crossfade(true) }
                                 .build()
@@ -303,12 +308,7 @@ fun HeaderImagesSlider(
                         contentDescription = "",
                         modifier = Modifier
                             .size(50.dp, 50.dp)
-                            .padding(
-                                start = 10.dp,
-                                end = 5.dp,
-                                top = 5.dp,
-                                bottom = 5.dp
-                            )
+                            .padding(6.dp)
                     )
 
                 }

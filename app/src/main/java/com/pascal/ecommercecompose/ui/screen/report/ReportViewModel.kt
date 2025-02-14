@@ -22,7 +22,7 @@ import com.itextpdf.layout.element.Table
 import com.itextpdf.layout.properties.TextAlignment
 import com.itextpdf.layout.properties.UnitValue
 import com.pascal.ecommercecompose.R
-import com.pascal.ecommercecompose.data.local.entity.ProductEntity
+import com.pascal.ecommercecompose.data.local.entity.CartEntity
 import com.pascal.ecommercecompose.data.local.repository.LocalRepository
 import com.pascal.ecommercecompose.data.prefs.PreferencesLogin
 import com.pascal.ecommercecompose.data.repository.firebase.FirebaseRepository
@@ -43,7 +43,7 @@ class ReportViewModel(
     private val _uiState = MutableStateFlow(ReportUIState())
     val uiState get() = _uiState.asStateFlow()
 
-    suspend fun loadReport(product: List<ProductEntity>?) {
+    suspend fun loadReport(product: List<CartEntity>?) {
         _uiState.update { it.copy(isLoading = true) }
 
         when (val result = firebaseAuthRepository.addTransaction(product)) {
@@ -65,7 +65,7 @@ class ReportViewModel(
         }
     }
 
-    fun generatePdfAndOpen(context: Context, product: List<ProductEntity>?) {
+    fun generatePdfAndOpen(context: Context, product: List<CartEntity>?) {
         _uiState.update { it.copy(isLoading = true) }
 
         try {

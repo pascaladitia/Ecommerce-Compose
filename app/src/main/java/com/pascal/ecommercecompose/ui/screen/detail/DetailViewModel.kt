@@ -3,6 +3,8 @@ package com.pascal.ecommercecompose.ui.screen.detail
 import android.content.Context
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import com.pascal.ecommercecompose.data.local.entity.CartEntity
+import com.pascal.ecommercecompose.data.local.entity.FavoriteEntity
 import com.pascal.ecommercecompose.data.local.entity.ProductEntity
 import com.pascal.ecommercecompose.data.local.repository.LocalRepository
 import com.pascal.ecommercecompose.data.repository.Repository
@@ -24,14 +26,14 @@ class DetailViewModel(
         _uiState.update { it.copy(isLoading = true, product = null) }
 
         try {
-            val favDb = loadFavorite().orEmpty()
-
-            val result = repository.getProductById(id?.toIntOrNull() ?: 0)
+            val favDb = loadFavorite(id)
+            val result = repository.getProductById(id?.toIntOrNull() ?: 0).apply {
+                isFavorite = favDb
+            }
 
             _uiState.update {
                 it.copy(
                     isLoading = false,
-                    isFavorite = result.id in favDb,
                     product = result
                 )
             }
@@ -50,7 +52,7 @@ class DetailViewModel(
         _uiState.update { it.copy(isLoading = true) }
 
         try {
-            val entity = ProductEntity(
+            val entity = CartEntity(
                 id = product?.id?.toLong() ?: 0L,
                 name = product?.title,
                 price = product?.price,
@@ -81,7 +83,7 @@ class DetailViewModel(
         }
     }
 
-    suspend fun loadCart(context: Context, entity: ProductEntity) {
+    private suspend fun loadCart(context: Context, entity: CartEntity) {
         try {
             database.insertCart(entity)
             showToast(context, "Success Add to Cart")
@@ -106,9 +108,11 @@ class DetailViewModel(
         }
     }
 
-    private suspend fun loadFavorite(): List<Int>? {
+    private suspend fun loadFavorite(id: String?): Boolean? {
         try {
-            return database.getAllCart().map { it.id.toInt() }
+            val result = database.getFavoriteById(id?.toLong() ?: 0)
+            Log.e("Tag result", result.toString())
+            return result != null
         } catch (e: Exception) {
             Log.e("Tag Favorite", e.message.toString())
             return null
@@ -117,7 +121,7 @@ class DetailViewModel(
 
     suspend fun saveFavorite(isFav: Boolean, product: ProductDetails?) {
         try {
-            val entity = ProductEntity(
+            val entity = FavoriteEntity(
                 id = product?.id?.toLong() ?: 0L,
                 name = product?.title,
                 price = product?.price,

@@ -2,6 +2,7 @@ package com.pascal.ecommercecompose.ui.screen.home
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import com.pascal.ecommercecompose.data.local.entity.FavoriteEntity
 import com.pascal.ecommercecompose.data.local.entity.ProductEntity
 import com.pascal.ecommercecompose.data.local.repository.LocalRepository
 import com.pascal.ecommercecompose.data.repository.Repository
@@ -115,7 +116,7 @@ class HomeViewModel(
 
     private suspend fun loadFavorite(): List<Int>? {
         try {
-            return database.getAllCart().map { it.id.toInt() }
+            return database.getAllFavorite().map { it.id.toInt() }
         } catch (e: Exception) {
            Log.e("Tag Favorite", e.message.toString())
             return null
@@ -124,7 +125,7 @@ class HomeViewModel(
 
     suspend fun saveFavorite(isFav: Boolean, product: ProductDetails?) {
         try {
-            val entity = ProductEntity(
+            val entity = FavoriteEntity(
                 id = product?.id?.toLong() ?: 0L,
                 name = product?.title,
                 price = product?.price,

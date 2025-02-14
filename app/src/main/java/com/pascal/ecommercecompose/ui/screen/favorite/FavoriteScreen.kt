@@ -60,7 +60,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.pascal.ecommercecompose.R
-import com.pascal.ecommercecompose.data.local.entity.ProductEntity
+import com.pascal.ecommercecompose.data.local.entity.FavoriteEntity
 import com.pascal.ecommercecompose.data.prefs.PreferencesLogin
 import com.pascal.ecommercecompose.domain.model.user.User
 import com.pascal.ecommercecompose.ui.component.screenUtils.TopAppBarHeader
@@ -70,6 +70,7 @@ import com.pascal.ecommercecompose.ui.theme.lightorange
 import com.pascal.ecommercecompose.ui.theme.orange
 import com.pascal.ecommercecompose.ui.theme.subTitleTextColor
 import com.pascal.ecommercecompose.ui.theme.titleTextColor
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -77,7 +78,7 @@ fun FavoriteScreen(
     modifier: Modifier = Modifier,
     paddingValues: PaddingValues,
     viewModel: FavoriteViewModel = koinViewModel(),
-    onDetail: (ProductEntity?) -> Unit
+    onDetail: (FavoriteEntity?) -> Unit
 ) {
     val context = LocalContext.current
     val pref = PreferencesLogin.getLoginResponse(context)
@@ -97,10 +98,12 @@ fun FavoriteScreen(
             uiState = uiState,
             uiEvent = FavoriteUIEvent(
                 onDetail = {
-
+                    onDetail(it)
                 },
                 onDelete = {
-
+                    coroutine.launch {
+                        viewModel.delete(it)
+                    }
                 }
             )
         )
@@ -305,7 +308,7 @@ private fun FavoritePreview() {
     AppTheme {
         FavoriteContent(
             uiState = FavoriteUIState(
-                product = listOf(ProductEntity(), ProductEntity())
+                product = listOf(FavoriteEntity(), FavoriteEntity())
             ),
             uiEvent = FavoriteUIEvent()
         )

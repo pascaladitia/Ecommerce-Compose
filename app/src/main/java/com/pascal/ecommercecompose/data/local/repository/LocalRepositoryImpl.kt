@@ -1,5 +1,7 @@
 package com.pascal.ecommercecompose.data.local.repository
 
+import com.pascal.ecommercecompose.data.local.entity.CartEntity
+import com.pascal.ecommercecompose.data.local.entity.FavoriteEntity
 import com.pascal.ecommercecompose.data.local.entity.ProductEntity
 import com.pascal.ecommercecompose.data.local.entity.ProfileEntity
 
@@ -10,17 +12,17 @@ interface LocalRepositoryImpl {
     suspend fun deleteProfileById(item: ProfileEntity)
     suspend fun insertProfile(item: ProfileEntity)
 
-    suspend fun getCartById(id: Long): ProductEntity?
-    suspend fun getAllCart(): List<ProductEntity>
-    suspend fun deleteCartById(item: ProductEntity)
+    suspend fun getCartById(id: Long): CartEntity?
+    suspend fun getAllCart(): List<CartEntity>
+    suspend fun deleteCartById(item: CartEntity)
     suspend fun deleteCart()
-    suspend fun insertCart(item: ProductEntity)
+    suspend fun insertCart(item: CartEntity)
 
-    suspend fun getFavoriteById(id: Long): ProductEntity?
-    suspend fun getAllFavorite(): List<ProductEntity>
-    suspend fun deleteFavoriteById(item: ProductEntity)
+    suspend fun getFavoriteById(id: Long): FavoriteEntity?
+    suspend fun getAllFavorite(): List<FavoriteEntity>
+    suspend fun deleteFavoriteById(item: FavoriteEntity)
     suspend fun deleteFavorite()
-    suspend fun insertFavorite(item: ProductEntity)
+    suspend fun insertFavorite(item: FavoriteEntity)
 
     suspend fun getProductById(id: Long): ProductEntity?
     suspend fun getAllProduct(): List<ProductEntity>

@@ -10,6 +10,7 @@ import android.provider.MediaStore
 import android.webkit.MimeTypeMap
 import android.widget.Toast
 import androidx.core.content.ContextCompat
+import com.pascal.ecommercecompose.data.local.entity.CartEntity
 import com.pascal.ecommercecompose.data.local.entity.ProductEntity
 import com.pascal.ecommercecompose.utils.Constant.FORMAT_DATE
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -35,7 +36,7 @@ fun getCurrentFormattedDate(): String {
 }
 
 @SuppressLint("DefaultLocale")
-fun calculateTotalPrice(products: List<ProductEntity?>): String {
+fun calculateTotalPrice(products: List<CartEntity?>): String {
     val total = products.sumOf { (it?.price ?: 0.0) * (it?.qty ?: 0) }
     return String.format("%.2f", total)
 }

@@ -5,22 +5,22 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.pascal.ecommercecompose.data.local.entity.ProductEntity
+import com.pascal.ecommercecompose.data.local.entity.FavoriteEntity
 
 @Dao
 interface FavoriteDao {
-    @Query("SELECT * FROM Product WHERE id = :id")
-    suspend fun getFavoriteById(id: Long): ProductEntity?
+    @Query("SELECT * FROM Favorite WHERE id = :id")
+    suspend fun getFavoriteById(id: Long): FavoriteEntity?
 
-    @Query("SELECT * FROM Product")
-    suspend fun getAllFavorites(): List<ProductEntity>
+    @Query("SELECT * FROM Favorite")
+    suspend fun getAllFavorites(): List<FavoriteEntity>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertFavorite(entity: ProductEntity)
+    suspend fun insertFavorite(entity: FavoriteEntity)
 
     @Delete
-    suspend fun deleteFavorite(entity: ProductEntity)
+    suspend fun deleteFavorite(entity: FavoriteEntity)
 
-    @Query("DELETE FROM Product")
+    @Query("DELETE FROM Favorite")
     suspend fun clearFavorite()
 }
