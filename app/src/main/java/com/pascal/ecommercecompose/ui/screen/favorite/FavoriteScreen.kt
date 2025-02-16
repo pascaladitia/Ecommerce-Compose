@@ -86,7 +86,7 @@ fun FavoriteScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
-        viewModel.loadFavorite()
+        viewModel.loadFavorite(context)
     }
 
     Surface(
@@ -102,7 +102,7 @@ fun FavoriteScreen(
                 },
                 onDelete = {
                     coroutine.launch {
-                        viewModel.delete(it)
+                        viewModel.delete(context, it)
                     }
                 }
             )

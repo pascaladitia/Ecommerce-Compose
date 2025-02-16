@@ -11,6 +11,7 @@ import com.pascal.ecommercecompose.data.local.entity.FavoriteEntity
 import com.pascal.ecommercecompose.data.local.entity.ProductEntity
 import com.pascal.ecommercecompose.data.local.repository.LocalRepository
 import com.pascal.ecommercecompose.data.prefs.PreferencesCategory
+import com.pascal.ecommercecompose.data.prefs.PreferencesLogin
 import com.pascal.ecommercecompose.data.repository.Repository
 import com.pascal.ecommercecompose.utils.checkInternet
 import kotlinx.coroutines.Dispatchers
@@ -129,10 +130,13 @@ class HomeViewModel(
         }
     }
 
-    suspend fun saveFavorite(isFav: Boolean, product: ProductEntity?) {
+    suspend fun saveFavorite(context: Context, isFav: Boolean, product: ProductEntity?) {
         try {
+            val pref = PreferencesLogin.getLoginResponse(context)
+
             val entity = FavoriteEntity(
                 id = product?.id?.toLong() ?: 0L,
+                userId = pref?.id,
                 name = product?.title,
                 price = product?.price,
                 imageID = product?.thumbnail,

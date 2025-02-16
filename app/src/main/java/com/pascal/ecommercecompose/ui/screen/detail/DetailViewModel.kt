@@ -8,6 +8,7 @@ import com.pascal.ecommercecompose.data.local.entity.FavoriteEntity
 import com.pascal.ecommercecompose.data.local.repository.LocalRepository
 import com.pascal.ecommercecompose.data.repository.Repository
 import com.pascal.ecommercecompose.data.local.entity.ProductEntity
+import com.pascal.ecommercecompose.data.prefs.PreferencesLogin
 import com.pascal.ecommercecompose.utils.checkInternet
 import com.pascal.ecommercecompose.utils.showToast
 import kotlinx.coroutines.Dispatchers
@@ -57,11 +58,14 @@ class DetailViewModel(
     }
 
     suspend fun getCart(context: Context, product: ProductEntity?) {
+        val pref = PreferencesLogin.getLoginResponse(context)
+
         _uiState.update { it.copy(isLoading = true) }
 
         try {
             val entity = CartEntity(
                 id = product?.id?.toLong() ?: 0L,
+                userId = pref?.id,
                 name = product?.title,
                 price = product?.price,
                 imageID = product?.thumbnail,
@@ -75,10 +79,7 @@ class DetailViewModel(
             if (result == null) {
                 loadCart(context, entity)
             } else {
-                loadCart(context, result.apply {
-                        qty = result.qty?.plus(1)
-                    }
-                )
+                loadCart(context, result.apply { qty = result.qty?.plus(1) })
             }
         } catch (e: Exception) {
             _uiState.update {
@@ -126,10 +127,13 @@ class DetailViewModel(
         }
     }
 
-    suspend fun saveFavorite(isFav: Boolean, product: ProductEntity?) {
+    suspend fun saveFavorite(context: Context, isFav: Boolean, product: ProductEntity?) {
         try {
+            val pref = PreferencesLogin.getLoginResponse(context)
+
             val entity = FavoriteEntity(
                 id = product?.id?.toLong() ?: 0L,
+                userId = pref?.id,
                 name = product?.title,
                 price = product?.price,
                 imageID = product?.thumbnail,

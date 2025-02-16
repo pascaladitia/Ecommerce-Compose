@@ -140,7 +140,7 @@ fun HomeScreen(
                         },
                         onFavorite = { isFav, item ->
                             coroutine.launch {
-                                viewModel.saveFavorite(isFav, item)
+                                viewModel.saveFavorite(context, isFav, item)
                             }
                         },
                         onDetail = {

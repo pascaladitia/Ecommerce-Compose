@@ -3,6 +3,7 @@ package com.pascal.ecommercecompose.ui.screen.cart
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import com.pascal.ecommercecompose.data.local.repository.LocalRepository
+import com.pascal.ecommercecompose.data.prefs.PreferencesLogin
 import com.pascal.ecommercecompose.data.repository.Repository
 import com.pascal.ecommercecompose.utils.Constant
 import com.pascal.ecommercecompose.utils.checkInternet
@@ -27,11 +28,13 @@ class CartViewModel(
     private val _uiState = MutableStateFlow(CartUIState())
     val uiState get() = _uiState.asStateFlow()
 
-    suspend fun getCart() {
+    suspend fun getCart(context: Context) {
+        val pref = PreferencesLogin.getLoginResponse(context)
+
         _uiState.update { it.copy(isLoading = true) }
 
         try {
-            val result = database.getAllCart()
+            val result = database.getAllCart().filter { it.userId.toString() == pref?.id }
 
             _uiState.update {
                 it.copy(

@@ -8,6 +8,7 @@ import java.io.Serializable
 @kotlinx.serialization.Serializable
 data class CartEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val userId: String? = null,
     val name: String? = null,
     val price: Double? = null,
     val imageID: String? = null,

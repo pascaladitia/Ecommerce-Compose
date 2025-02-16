@@ -87,7 +87,7 @@ fun CartScreen(
     var listProduct by remember { mutableStateOf<List<CartEntity?>?>(null) }
 
     LaunchedEffect(Unit) {
-        viewModel.getCart()
+        viewModel.getCart(context)
     }
 
     Surface(

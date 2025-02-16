@@ -1,9 +1,11 @@
 package com.pascal.ecommercecompose.ui.screen.favorite
 
+import android.content.Context
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.pascal.ecommercecompose.data.local.entity.FavoriteEntity
 import com.pascal.ecommercecompose.data.local.repository.LocalRepository
+import com.pascal.ecommercecompose.data.prefs.PreferencesLogin
 import com.pascal.ecommercecompose.data.repository.Repository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -19,11 +21,13 @@ class FavoriteViewModel(
     private val _uiState = MutableStateFlow(FavoriteUIState())
     val uiState get() = _uiState.asStateFlow()
 
-    suspend fun loadFavorite() {
+    suspend fun loadFavorite(context: Context) {
+        val pref = PreferencesLogin.getLoginResponse(context)
+
         _uiState.update { it.copy(isLoading = true, product = null) }
 
         try {
-            val result = database.getAllFavorite()
+            val result = database.getAllFavorite().filter { it.userId.toString() == pref?.id }
             _uiState.update {
                 it.copy(
                     isLoading = false,
@@ -41,11 +45,11 @@ class FavoriteViewModel(
         }
     }
 
-    suspend fun delete(product: FavoriteEntity?) {
+    suspend fun delete(context: Context, product: FavoriteEntity?) {
         try {
             product?.let {
                 database.deleteFavoriteById(it)
-                loadFavorite()
+                loadFavorite(context)
             }
         } catch (e: Exception) {
             Log.e("Tag Favorite", e.message.toString())
