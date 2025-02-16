@@ -2,14 +2,17 @@ package com.pascal.ecommercecompose.data.repository.firebase
 
 import android.content.Intent
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.tasks.Tasks.await
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.FirebaseFirestore
 import com.pascal.ecommercecompose.data.local.entity.CartEntity
 import com.pascal.ecommercecompose.domain.base.Resource
+import com.pascal.ecommercecompose.domain.model.transaction.TransactionModel
 import com.pascal.ecommercecompose.domain.model.user.User
 import com.pascal.ecommercecompose.utils.calculateTotalPrice
+import com.pascal.ecommercecompose.utils.getCurrentFormattedDate
 import kotlinx.coroutines.tasks.await
 
 class FirebaseRepository(
@@ -17,8 +20,6 @@ class FirebaseRepository(
     private val googleSignInClient: GoogleSignInClient,
     private val firestore: FirebaseFirestore
 ) {
-    fun isUserLoggedIn(): Boolean = auth.currentUser != null
-
     // Auth
     suspend fun signUp(email: String, password: String): Resource<String> {
         return try {
@@ -58,52 +59,38 @@ class FirebaseRepository(
     }
 
     // Firestore
-    suspend fun addTransaction(products: List<CartEntity>?): Resource<String> {
+    suspend fun addTransaction(pref: User?, products: List<CartEntity>?): Resource<Boolean> {
         return try {
-            val transactionData = hashMapOf(
-                "date" to System.currentTimeMillis(),
-                "totalAmount" to calculateTotalPrice(products ?: emptyList())
+            val transaction = TransactionModel(
+                userId = pref?.id,
+                userName = pref?.name,
+                date = getCurrentFormattedDate(),
+                total = calculateTotalPrice(products ?: emptyList()),
+                products = products
             )
 
-            val transactionRef = firestore.collection("transactions").add(transactionData).await()
-            val transactionId = transactionRef.id
+            firestore.collection("transaction")
+                .add(transaction)
+                .await()
 
-            val batch = firestore.batch()
+            Resource.Success(true)
+        } catch (e: Exception) {
+            Resource.Error(e)
+        }
+    }
 
-            for (product in products ?: emptyList()) {
-                val productRef = transactionRef.collection("products").document()
-                val productData = hashMapOf(
-                    "name" to product.name,
-                    "price" to product.price,
-                    "qty" to product.qty,
-                    "category" to product.category,
-                    "description" to product.description,
-                    "imageID" to product.imageID
-                )
-                batch.set(productRef, productData)
+    suspend fun getTransactionById(userId: String): Resource<List<TransactionModel>> {
+        return try {
+            val transactionsSnapshot = firestore.collection("transaction")
+                .whereEqualTo("userId", userId)
+                .get()
+                .await()
+
+            val transactions = transactionsSnapshot.documents.mapNotNull {
+                it.toObject(TransactionModel::class.java)
             }
 
-            batch.commit().await()
-            Resource.Success(transactionId)
-        } catch (e: Exception) {
-            Resource.Error(e)
-        }
-    }
-
-    suspend fun getTransaction(): Resource<List<CartEntity>> {
-        return try {
-            val snapshot = firestore.collection("transaction").get().await()
-            val products = snapshot.toObjects(CartEntity::class.java)
-            Resource.Success(products)
-        } catch (e: Exception) {
-            Resource.Error(e)
-        }
-    }
-
-    suspend fun deleteTransaction(productId: String): Resource<Boolean> {
-        return try {
-            firestore.collection("transaction").document(productId).delete().await()
-            Resource.Success(true)
+            Resource.Success(transactions)
         } catch (e: Exception) {
             Resource.Error(e)
         }

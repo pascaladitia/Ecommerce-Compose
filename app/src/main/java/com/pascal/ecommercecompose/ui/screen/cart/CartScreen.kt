@@ -134,7 +134,6 @@ fun CartContent(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .verticalScroll(rememberScrollState())
     ) {
         Column(
             modifier = Modifier
@@ -147,11 +146,13 @@ fun CartContent(
             Spacer(modifier = Modifier.padding(20.dp))
             CartItemList(product = product)
             Spacer(modifier = Modifier.padding(20.dp))
-            NextButtonWithTotalItems(
-                product = product,
-                uiEvent = uiEvent
-            )
         }
+
+        NextButtonWithTotalItems(
+            modifier = Modifier.align(Alignment.BottomCenter),
+            product = product,
+            uiEvent = uiEvent
+        )
     }
 }
 
@@ -333,7 +334,11 @@ fun NextButtonWithTotalItems(
     product: List<CartEntity>,
     uiEvent: CartUIEvent
 ) {
-    Column(modifier = modifier.fillMaxWidth()) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 20.dp)
+    ) {
         HorizontalDivider(color = lightGrey, thickness = 2.dp)
         Spacer(modifier = Modifier.padding(8.dp))
         Row(

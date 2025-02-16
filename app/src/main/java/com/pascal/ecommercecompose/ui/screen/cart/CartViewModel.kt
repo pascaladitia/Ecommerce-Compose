@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import com.pascal.ecommercecompose.data.local.repository.LocalRepository
 import com.pascal.ecommercecompose.data.prefs.PreferencesLogin
-import com.pascal.ecommercecompose.data.repository.Repository
+import com.pascal.ecommercecompose.data.repository.remote.Repository
 import com.pascal.ecommercecompose.utils.Constant
 import com.pascal.ecommercecompose.utils.checkInternet
 import kotlinx.coroutines.Dispatchers

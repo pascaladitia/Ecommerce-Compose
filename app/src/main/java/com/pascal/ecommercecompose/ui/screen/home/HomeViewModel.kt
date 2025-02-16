@@ -12,7 +12,7 @@ import com.pascal.ecommercecompose.data.local.entity.ProductEntity
 import com.pascal.ecommercecompose.data.local.repository.LocalRepository
 import com.pascal.ecommercecompose.data.prefs.PreferencesCategory
 import com.pascal.ecommercecompose.data.prefs.PreferencesLogin
-import com.pascal.ecommercecompose.data.repository.Repository
+import com.pascal.ecommercecompose.data.repository.remote.Repository
 import com.pascal.ecommercecompose.utils.checkInternet
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -40,7 +40,7 @@ class HomeViewModel(
         _uiState.update { it.copy(isLoading = true, product = emptyList()) }
 
         try {
-            val favDb = loadFavorite().orEmpty()
+            val favDb = loadFavorite(context).orEmpty()
 
             val result = if (isOnline(context)) {
                 if (name.isEmpty()) repository.getProducts().products.orEmpty()
@@ -121,9 +121,11 @@ class HomeViewModel(
         }
     }
 
-    private suspend fun loadFavorite(): List<Int>? {
+    private suspend fun loadFavorite(context: Context): List<Int>? {
         try {
-            return database.getAllFavorite().map { it.id.toInt() }
+            val pref = PreferencesLogin.getLoginResponse(context)
+            return database.getAllFavorite().filter { it.userId.toString() == pref?.id }
+                .map { it.id.toInt() }
         } catch (e: Exception) {
            Log.e("Tag Favorite", e.message.toString())
             return null

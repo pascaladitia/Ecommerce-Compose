@@ -43,12 +43,14 @@ class ReportViewModel(
     private val _uiState = MutableStateFlow(ReportUIState())
     val uiState get() = _uiState.asStateFlow()
 
-    suspend fun loadReport(product: List<CartEntity>?) {
+    suspend fun loadReport(context: Context, product: List<CartEntity>?) {
+        val pref = PreferencesLogin.getLoginResponse(context)
+
         _uiState.update { it.copy(isLoading = true) }
 
-        when (val result = firebaseAuthRepository.addTransaction(product)) {
+        when (val result = firebaseAuthRepository.addTransaction(pref, product)) {
             is Resource.Success -> {
-                Log.d("tag report", result.data)
+                Log.d("tag report", result.data.toString())
             }
 
             is Resource.Error -> {

@@ -8,7 +8,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.pascal.ecommercecompose.data.local.database.AppDatabase
 import com.pascal.ecommercecompose.data.local.repository.LocalRepository
-import com.pascal.ecommercecompose.data.repository.Repository
+import com.pascal.ecommercecompose.data.repository.remote.Repository
 import com.pascal.ecommercecompose.data.repository.firebase.FirebaseRepository
 import com.pascal.ecommercecompose.ui.screen.cart.CartViewModel
 import com.pascal.ecommercecompose.ui.screen.detail.DetailViewModel

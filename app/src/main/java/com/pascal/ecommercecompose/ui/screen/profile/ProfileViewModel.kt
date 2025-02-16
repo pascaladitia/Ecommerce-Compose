@@ -22,14 +22,30 @@ class ProfileViewModel(
     val uiState get() = _uiState.asStateFlow()
 
     suspend fun loadVerified(id: String) {
-        _uiState.update { it.copy(isLoading = true) }
-
         when (val result = firebaseAuthRepository.getVerifiedById(id)) {
             is Resource.Success -> {
                 _uiState.update {
                     it.copy(
-                        isLoading = false,
                         isVerified = result.data
+                    )
+                }
+            }
+
+            is Resource.Error -> {
+                Log.e("SignOut", result.exception.message.toString())
+            }
+        }
+    }
+
+    suspend fun loadTransaction(id: String) {
+        _uiState.update { it.copy(isLoading = true) }
+
+        when (val result = firebaseAuthRepository.getTransactionById(id)) {
+            is Resource.Success -> {
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        transactionList = result.data
                     )
                 }
             }

@@ -1,4 +1,4 @@
-package com.pascal.ecommercecompose.data.repository
+package com.pascal.ecommercecompose.data.repository.remote
 
 import com.pascal.ecommercecompose.data.local.entity.ProductEntity
 import com.pascal.ecommercecompose.domain.model.product.ProductResponse

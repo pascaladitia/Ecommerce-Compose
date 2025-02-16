@@ -57,7 +57,7 @@ fun ReportScreen(
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
-        viewModel.loadReport(product)
+        viewModel.loadReport(context, product)
         viewModel.deleteCart()
     }
 

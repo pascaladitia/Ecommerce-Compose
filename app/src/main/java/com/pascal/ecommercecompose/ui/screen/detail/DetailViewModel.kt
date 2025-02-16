@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel
 import com.pascal.ecommercecompose.data.local.entity.CartEntity
 import com.pascal.ecommercecompose.data.local.entity.FavoriteEntity
 import com.pascal.ecommercecompose.data.local.repository.LocalRepository
-import com.pascal.ecommercecompose.data.repository.Repository
+import com.pascal.ecommercecompose.data.repository.remote.Repository
 import com.pascal.ecommercecompose.data.local.entity.ProductEntity
 import com.pascal.ecommercecompose.data.prefs.PreferencesLogin
 import com.pascal.ecommercecompose.utils.checkInternet
