@@ -20,4 +20,6 @@ while Max Air cushioning adds comfort to the journey.
     </string>
     <string name="connection_offline">Ups, Your connection is offline!</string>
     <string name="connection_online">Yeay, Your connection is online!</string>
+    <string name="detection_failed">Verified Smile Detection Failed!</string>
+    <string name="detection_success">Verified Smile Detection Success!</string>
 </resources>

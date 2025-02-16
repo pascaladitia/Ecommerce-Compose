@@ -3,7 +3,6 @@ package com.pascal.ecommercecompose.ui.screen.verified
 import android.content.Context
 import android.util.Log
 import android.widget.FrameLayout
-import android.widget.Toast
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ExperimentalGetImage
 import androidx.camera.core.ImageAnalysis
@@ -15,10 +14,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -27,44 +28,67 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.google.common.util.concurrent.ListenableFuture
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.face.FaceDetection
 import com.google.mlkit.vision.face.FaceDetector
 import com.google.mlkit.vision.face.FaceDetectorOptions
-import com.pascal.ecommercecompose.data.prefs.PreferencesLogin
+import com.pascal.ecommercecompose.ui.component.screenUtils.LoadingScreen
 import com.pascal.ecommercecompose.ui.theme.AppTheme
+import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun VerifiedScreen(
     modifier: Modifier = Modifier,
+    viewModel: VerifiedViewModel = koinViewModel(),
     onNavBack: () -> Unit
 ) {
     val context = LocalContext.current
-    val pref = PreferencesLogin.getLoginResponse(context)
-    var detectedSmile by remember { mutableStateOf(false) }
+    val coroutine = rememberCoroutineScope()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    var isProcessing by remember { mutableStateOf(false) }
+
+    val cameraProviderFuture = remember { ProcessCameraProvider.getInstance(context) }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            cameraProviderFuture.get().unbindAll()
+        }
+    }
 
     Column(
+        modifier = modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-        modifier = Modifier.fillMaxSize()
+        verticalArrangement = Arrangement.Center
     ) {
-        if (detectedSmile) {
-            Toast.makeText(LocalContext.current, "Deteksi Senyum Berhasil!", Toast.LENGTH_SHORT).show()
-
-            PreferencesLogin.setLoginResponse(context, pref?.apply { isVerified = true })
+        if (uiState.isLoading) LoadingScreen()
+        if (uiState.isVerified) {
+            cameraProviderFuture.get().unbindAll()
             onNavBack()
         }
 
         Box(modifier = Modifier.fillMaxSize()) {
-            CameraPreview(LocalContext.current) { smileDetected ->
-                detectedSmile = smileDetected
+            CameraPreview(context, cameraProviderFuture) { smileDetected ->
+                if (smileDetected && !isProcessing) {
+                    isProcessing = true
+                    coroutine.launch {
+                        viewModel.loadVerified(context, smileDetected)
+                    }
+                }
             }
         }
     }
 }
 
+
 @Composable
-fun CameraPreview(context: Context, onSmileDetected: (Boolean) -> Unit) {
+fun CameraPreview(
+    context: Context,
+    cameraProviderFuture: ListenableFuture<ProcessCameraProvider>,
+    onSmileDetected: (Boolean) -> Unit
+) {
     val faceDetector = remember {
         FaceDetection.getClient(
             FaceDetectorOptions.Builder()
@@ -77,20 +101,20 @@ fun CameraPreview(context: Context, onSmileDetected: (Boolean) -> Unit) {
         )
     }
 
-    val cameraProviderFuture = remember { ProcessCameraProvider.getInstance(context) }
     val previewView = remember { PreviewView(context) }
 
     LaunchedEffect(cameraProviderFuture) {
-        cameraProviderFuture.addListener({
+        cameraProviderFuture.addListener(
+            {
                 try {
                     val cameraProvider = cameraProviderFuture.get()
-
+                    cameraProvider.unbindAll()
                     val cameraSelector = CameraSelector.DEFAULT_FRONT_CAMERA
 
                     val preview = androidx.camera.core.Preview.Builder().build()
                     val imageAnalysis = ImageAnalysis.Builder().build()
 
-                    preview.setSurfaceProvider(previewView.surfaceProvider)
+                    preview.surfaceProvider = previewView.surfaceProvider
 
                     imageAnalysis.setAnalyzer(ContextCompat.getMainExecutor(context)) { imageProxy ->
                         analyzeImage(imageProxy, faceDetector, onSmileDetected)
@@ -147,8 +171,6 @@ fun analyzeImage(
             Log.e("SmileDetection", "Deteksi wajah gagal", exception)
             imageProxy.close()
         }
-
-
 }
 
 @Preview(showBackground = true)

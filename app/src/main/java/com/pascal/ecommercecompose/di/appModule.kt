@@ -18,6 +18,7 @@ import com.pascal.ecommercecompose.ui.screen.login.LoginViewModel
 import com.pascal.ecommercecompose.ui.screen.profile.ProfileViewModel
 import com.pascal.ecommercecompose.ui.screen.register.RegisterViewModel
 import com.pascal.ecommercecompose.ui.screen.report.ReportViewModel
+import com.pascal.ecommercecompose.ui.screen.verified.VerifiedViewModel
 import com.pascal.ecommercecompose.utils.Constant
 import kotlinx.coroutines.Dispatchers
 import org.koin.android.ext.koin.androidContext
@@ -56,4 +57,5 @@ val appModule = module {
     singleOf(::ProfileViewModel)
     singleOf(::DetailViewModel)
     singleOf(::ReportViewModel)
+    singleOf(::VerifiedViewModel)
 }

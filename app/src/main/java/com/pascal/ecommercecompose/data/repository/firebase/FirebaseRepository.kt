@@ -7,8 +7,8 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.FirebaseFirestore
 import com.pascal.ecommercecompose.data.local.entity.CartEntity
-import com.pascal.ecommercecompose.data.local.entity.FavoriteEntity
 import com.pascal.ecommercecompose.domain.base.Resource
+import com.pascal.ecommercecompose.domain.model.user.User
 import com.pascal.ecommercecompose.utils.calculateTotalPrice
 import kotlinx.coroutines.tasks.await
 
@@ -90,18 +90,17 @@ class FirebaseRepository(
         }
     }
 
-
-    suspend fun getProducts(): Resource<List<FavoriteEntity>> {
+    suspend fun getTransaction(): Resource<List<CartEntity>> {
         return try {
             val snapshot = firestore.collection("transaction").get().await()
-            val products = snapshot.toObjects(FavoriteEntity::class.java)
+            val products = snapshot.toObjects(CartEntity::class.java)
             Resource.Success(products)
         } catch (e: Exception) {
             Resource.Error(e)
         }
     }
 
-    suspend fun deleteProduct(productId: String): Resource<Boolean> {
+    suspend fun deleteTransaction(productId: String): Resource<Boolean> {
         return try {
             firestore.collection("transaction").document(productId).delete().await()
             Resource.Success(true)
@@ -109,5 +108,30 @@ class FirebaseRepository(
             Resource.Error(e)
         }
     }
+
+    suspend fun addVerified(user: User): Resource<String> {
+        return try {
+            val userRef = firestore.collection("users").document(user.id ?: "")
+            userRef.set(user).await()
+            Resource.Success(user.id ?: "")
+        } catch (e: Exception) {
+            Resource.Error(e)
+        }
+    }
+
+    suspend fun getVerifiedById(userId: String): Resource<Boolean> {
+        return try {
+            val userSnapshot = firestore.collection("users")
+                .document(userId)
+                .get()
+                .await()
+
+            val user = userSnapshot.toObject(User::class.java)
+            Resource.Success(user != null)
+        } catch (e: Exception) {
+            Resource.Error(e)
+        }
+    }
+
 }
 

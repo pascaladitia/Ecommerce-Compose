@@ -4,9 +4,8 @@ import java.io.Serializable
 
 @kotlinx.serialization.Serializable
 data class User(
-    val id: String,
-    val name: String,
-    val email: String,
-    val photo_url: String = "",
-    var isVerified: Boolean = false
+    val id: String? = null,
+    val name: String? = null,
+    val email: String? = null,
+    val photo_url: String? = null
 ) : Serializable

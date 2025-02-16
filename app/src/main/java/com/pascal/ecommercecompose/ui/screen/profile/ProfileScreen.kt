@@ -27,6 +27,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -66,13 +67,15 @@ fun ProfileScreen(
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
+    LaunchedEffect(Unit) {
+        viewModel.loadVerified(pref?.id ?: "")
+    }
+
     Surface(
         modifier = modifier.padding(paddingValues),
         color = MaterialTheme.colorScheme.background
     ) {
-        if (uiState.isLoading) {
-            LoadingScreen()
-        }
+        if (uiState.isLoading) LoadingScreen()
         if (uiState.isError) {
             ShowDialog(
                 message = uiState.message,
@@ -85,6 +88,7 @@ fun ProfileScreen(
 
         ProfileContent(
             pref = pref,
+            uiState = uiState,
             uiEvent = ProfileUIEvent(
                 onVerified = {
                     onVerified()
@@ -104,8 +108,11 @@ fun ProfileScreen(
 fun ProfileContent(
     modifier: Modifier = Modifier,
     pref: User? = null,
+    uiState: ProfileUIState,
     uiEvent: ProfileUIEvent
 ) {
+    val isVerif = uiState.isVerified
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -158,8 +165,6 @@ fun ProfileContent(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        val isVerif = pref?.isVerified ?: false
-
         Box(
             modifier = modifier
                 .padding(horizontal = 24.dp)
@@ -202,6 +207,7 @@ fun ProfileContent(
 private fun ProfilePreview() {
     AppTheme {
         ProfileContent(
+            uiState = ProfileUIState(),
             uiEvent = ProfileUIEvent()
         )
     }
