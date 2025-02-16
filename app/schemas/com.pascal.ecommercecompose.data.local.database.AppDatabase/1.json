@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "2a229efd50eb9c63586f17b81221d2fa",
+    "identityHash": "a7c4aa605d3eeb37ba7e2922e2e44d5c",
     "entities": [
       {
         "tableName": "profiles",
@@ -54,7 +54,7 @@
       },
       {
         "tableName": "product",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT, `price` REAL, `imageID` TEXT, `category` TEXT, `description` TEXT, `qty` INTEGER)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `availabilityStatus` TEXT, `brand` TEXT, `category` TEXT, `description` TEXT, `discountPercentage` REAL, `images` TEXT, `minimumOrderQuantity` INTEGER, `price` REAL, `rating` REAL, `returnPolicy` TEXT, `reviews` TEXT, `shippingInformation` TEXT, `sku` TEXT, `stock` INTEGER, `tags` TEXT, `thumbnail` TEXT, `title` TEXT, `warrantyInformation` TEXT, `weight` INTEGER, `isFavorite` INTEGER)",
         "fields": [
           {
             "fieldPath": "id",
@@ -63,18 +63,13 @@
             "notNull": true
           },
           {
-            "fieldPath": "name",
-            "columnName": "name",
+            "fieldPath": "availabilityStatus",
+            "columnName": "availabilityStatus",
             "affinity": "TEXT"
           },
           {
-            "fieldPath": "price",
-            "columnName": "price",
-            "affinity": "REAL"
-          },
-          {
-            "fieldPath": "imageID",
-            "columnName": "imageID",
+            "fieldPath": "brand",
+            "columnName": "brand",
             "affinity": "TEXT"
           },
           {
@@ -88,8 +83,83 @@
             "affinity": "TEXT"
           },
           {
-            "fieldPath": "qty",
-            "columnName": "qty",
+            "fieldPath": "discountPercentage",
+            "columnName": "discountPercentage",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "images",
+            "columnName": "images",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "minimumOrderQuantity",
+            "columnName": "minimumOrderQuantity",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "price",
+            "columnName": "price",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "rating",
+            "columnName": "rating",
+            "affinity": "REAL"
+          },
+          {
+            "fieldPath": "returnPolicy",
+            "columnName": "returnPolicy",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "reviews",
+            "columnName": "reviews",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "shippingInformation",
+            "columnName": "shippingInformation",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "sku",
+            "columnName": "sku",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "stock",
+            "columnName": "stock",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "tags",
+            "columnName": "tags",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "thumbnail",
+            "columnName": "thumbnail",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "title",
+            "columnName": "title",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "warrantyInformation",
+            "columnName": "warrantyInformation",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "weight",
+            "columnName": "weight",
+            "affinity": "INTEGER"
+          },
+          {
+            "fieldPath": "isFavorite",
+            "columnName": "isFavorite",
             "affinity": "INTEGER"
           }
         ],
@@ -199,7 +269,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '2a229efd50eb9c63586f17b81221d2fa')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'a7c4aa605d3eeb37ba7e2922e2e44d5c')"
     ]
   }
 }

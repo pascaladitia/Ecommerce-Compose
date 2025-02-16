@@ -1,7 +1,6 @@
 package com.pascal.ecommercecompose.ui.screen.cart
 
 import com.pascal.ecommercecompose.data.local.entity.CartEntity
-import com.pascal.ecommercecompose.data.local.entity.ProductEntity
 
 data class CartUIState(
     val isLoading: Boolean = false,

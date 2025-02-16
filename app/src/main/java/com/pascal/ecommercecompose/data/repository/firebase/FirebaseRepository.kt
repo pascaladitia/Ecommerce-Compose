@@ -7,7 +7,7 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.FirebaseFirestore
 import com.pascal.ecommercecompose.data.local.entity.CartEntity
-import com.pascal.ecommercecompose.data.local.entity.ProductEntity
+import com.pascal.ecommercecompose.data.local.entity.FavoriteEntity
 import com.pascal.ecommercecompose.domain.base.Resource
 import com.pascal.ecommercecompose.utils.calculateTotalPrice
 import kotlinx.coroutines.tasks.await
@@ -91,10 +91,10 @@ class FirebaseRepository(
     }
 
 
-    suspend fun getProducts(): Resource<List<ProductEntity>> {
+    suspend fun getProducts(): Resource<List<FavoriteEntity>> {
         return try {
             val snapshot = firestore.collection("transaction").get().await()
-            val products = snapshot.toObjects(ProductEntity::class.java)
+            val products = snapshot.toObjects(FavoriteEntity::class.java)
             Resource.Success(products)
         } catch (e: Exception) {
             Resource.Error(e)

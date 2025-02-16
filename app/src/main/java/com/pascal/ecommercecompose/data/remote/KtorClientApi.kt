@@ -1,7 +1,7 @@
 package com.pascal.ecommercecompose.data.remote
 
 import com.pascal.ecommercecompose.BuildConfig
-import com.pascal.ecommercecompose.domain.model.product.ProductDetails
+import com.pascal.ecommercecompose.data.local.entity.ProductEntity
 import com.pascal.ecommercecompose.domain.model.product.ProductResponse
 import io.ktor.client.call.body
 import io.ktor.client.request.get
@@ -17,7 +17,7 @@ object KtorClientApi {
         return client.get("${BuildConfig.BASE_URL}/products/category/$name").body()
     }
 
-    suspend fun getProductById(id: Int): ProductDetails {
+    suspend fun getProductById(id: Int): ProductEntity {
         return client.get("${BuildConfig.BASE_URL}/products/$id").body()
     }
 

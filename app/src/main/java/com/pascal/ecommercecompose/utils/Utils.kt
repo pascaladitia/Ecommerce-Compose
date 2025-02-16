@@ -13,7 +13,6 @@ import android.webkit.MimeTypeMap
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import com.pascal.ecommercecompose.data.local.entity.CartEntity
-import com.pascal.ecommercecompose.data.local.entity.ProductEntity
 import com.pascal.ecommercecompose.utils.Constant.FORMAT_DATE
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody

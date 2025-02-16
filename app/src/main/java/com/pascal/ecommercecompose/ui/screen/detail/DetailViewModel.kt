@@ -5,10 +5,9 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.pascal.ecommercecompose.data.local.entity.CartEntity
 import com.pascal.ecommercecompose.data.local.entity.FavoriteEntity
-import com.pascal.ecommercecompose.data.local.entity.ProductEntity
 import com.pascal.ecommercecompose.data.local.repository.LocalRepository
 import com.pascal.ecommercecompose.data.repository.Repository
-import com.pascal.ecommercecompose.domain.model.product.ProductDetails
+import com.pascal.ecommercecompose.data.local.entity.ProductEntity
 import com.pascal.ecommercecompose.utils.showToast
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -48,7 +47,7 @@ class DetailViewModel(
         }
     }
 
-    suspend fun getCart(context: Context, product: ProductDetails?) {
+    suspend fun getCart(context: Context, product: ProductEntity?) {
         _uiState.update { it.copy(isLoading = true) }
 
         try {
@@ -119,7 +118,7 @@ class DetailViewModel(
         }
     }
 
-    suspend fun saveFavorite(isFav: Boolean, product: ProductDetails?) {
+    suspend fun saveFavorite(isFav: Boolean, product: ProductEntity?) {
         try {
             val entity = FavoriteEntity(
                 id = product?.id?.toLong() ?: 0L,

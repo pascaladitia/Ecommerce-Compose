@@ -66,11 +66,12 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.pascal.ecommercecompose.R
 import com.pascal.ecommercecompose.data.prefs.PreferencesLogin
-import com.pascal.ecommercecompose.domain.model.product.ProductDetails
+import com.pascal.ecommercecompose.data.local.entity.ProductEntity
 import com.pascal.ecommercecompose.domain.model.user.User
 import com.pascal.ecommercecompose.ui.component.dialog.ShowDialog
 import com.pascal.ecommercecompose.ui.component.form.Search
 import com.pascal.ecommercecompose.ui.component.screenUtils.LoadingScreen
+import com.pascal.ecommercecompose.ui.component.screenUtils.NetworkComponent
 import com.pascal.ecommercecompose.ui.component.screenUtils.PullRefreshComponent
 import com.pascal.ecommercecompose.ui.component.screenUtils.TopAppBarHeader
 import com.pascal.ecommercecompose.ui.theme.AppTheme
@@ -79,6 +80,7 @@ import com.pascal.ecommercecompose.ui.theme.lightorange
 import com.pascal.ecommercecompose.ui.theme.orange
 import com.pascal.ecommercecompose.ui.theme.subTitleTextColor
 import com.pascal.ecommercecompose.ui.theme.titleTextColor
+import com.pascal.ecommercecompose.utils.showToast
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
@@ -96,8 +98,8 @@ fun HomeScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
-        viewModel.loadProducts()
-        viewModel.loadCategory()
+        viewModel.loadProducts(context)
+        viewModel.loadCategory(context)
     }
 
     Surface(
@@ -117,31 +119,51 @@ fun HomeScreen(
 
         PullRefreshComponent(
             onRefresh = {
-                viewModel.loadProducts()
+                viewModel.loadProducts(context)
             }
         ) {
-            HomeContent(
-                user = pref,
-                uiState = uiState,
-                uiEvent = HomeUIEvent(
-                    onSearch = {
-                        viewModel.searchProduct(it)
-                    },
-                    onCategory = {
+            Box {
+                HomeContent(
+                    user = pref,
+                    uiState = uiState,
+                    uiEvent = HomeUIEvent(
+                        onSearch = {
+                            viewModel.searchProduct(it)
+                        },
+                        onCategory = {
+                            coroutine.launch {
+                                if (viewModel.isOnline(context)) {
+                                    viewModel.loadProducts(context, it)
+                                } else {
+                                    showToast(context, "Your connection is Offline!")
+                                }
+                            }
+                        },
+                        onFavorite = { isFav, item ->
+                            coroutine.launch {
+                                viewModel.saveFavorite(isFav, item)
+                            }
+                        },
+                        onDetail = {
+                            onDetail(it?.id.toString())
+                        }
+                    )
+                )
+
+                NetworkComponent(
+                    modifier = Modifier.align(Alignment.BottomCenter),
+                    isOnline = {
                         coroutine.launch {
-                            viewModel.loadProductsByCategory(it)
+                            viewModel.loadProducts(context)
                         }
                     },
-                    onFavorite = { isFav, item ->
+                    isOffline = {
                         coroutine.launch {
-                            viewModel.saveFavorite(isFav, item)
+                            viewModel.loadProducts(context)
                         }
-                    },
-                    onDetail = {
-                        onDetail(it?.id.toString())
                     }
                 )
-            )
+            }
         }
     }
 }
@@ -431,7 +453,7 @@ private fun HomePreview() {
         HomeContent(
             uiState = HomeUIState(
                 category = listOf("Category 1", "Category 2"),
-                product = listOf(ProductDetails(), ProductDetails(), ProductDetails()),
+                product = listOf(ProductEntity(), ProductEntity(), ProductEntity()),
             ),
             uiEvent = HomeUIEvent()
         )

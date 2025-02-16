@@ -1,7 +1,6 @@
 package com.pascal.ecommercecompose.ui.screen.detail
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -61,7 +60,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.pascal.ecommercecompose.R
-import com.pascal.ecommercecompose.domain.model.product.ProductDetails
+import com.pascal.ecommercecompose.data.local.entity.ProductEntity
 import com.pascal.ecommercecompose.domain.model.product.Review
 import com.pascal.ecommercecompose.ui.component.dialog.ShowDialog
 import com.pascal.ecommercecompose.ui.component.screenUtils.LoadingScreen
@@ -244,7 +243,7 @@ fun DetailContent(
 @Composable
 fun HeaderImagesSlider(
     modifier: Modifier = Modifier,
-    product: ProductDetails? = null
+    product: ProductEntity? = null
 ) {
     var isSelect by remember { mutableIntStateOf(0) }
     var showImage by remember { mutableStateOf(product?.images?.get(0)) }
@@ -321,7 +320,7 @@ fun HeaderImagesSlider(
 @Composable
 fun ProductTitle(
     modifier: Modifier = Modifier,
-    product: ProductDetails? = null
+    product: ProductEntity? = null
 ) {
     Column(
         modifier = modifier.fillMaxWidth(),
@@ -383,7 +382,7 @@ fun ProductTitle(
 @Composable
 fun ProductAvailableSize(
     modifier: Modifier = Modifier,
-    product: ProductDetails? = null
+    product: ProductEntity? = null
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
 
@@ -433,7 +432,7 @@ fun ProductAvailableSize(
 @Composable
 fun ProductItemColorWithDesc(
     modifier: Modifier = Modifier,
-    product: ProductDetails? = null
+    product: ProductEntity? = null
 ) {
     Column(modifier = modifier.fillMaxSize()) {
         Text(
@@ -453,7 +452,7 @@ fun ProductItemColorWithDesc(
 @Composable
 fun ProductReviews(
     modifier: Modifier = Modifier,
-    product: ProductDetails? = null
+    product: ProductEntity? = null
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
         Text(
@@ -508,7 +507,7 @@ private fun DetailPreview() {
     AppTheme {
         DetailContent(
             uiState = DetailUIState(
-                product = ProductDetails(
+                product = ProductEntity(
                     tags = listOf("Tags1", "Tags2"),
                     description = "Sample desc",
                     reviews = listOf(Review(), Review())
