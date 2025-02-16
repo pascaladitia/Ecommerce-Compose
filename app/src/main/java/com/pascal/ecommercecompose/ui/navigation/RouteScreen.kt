@@ -135,8 +135,7 @@ fun RouteScreen(
                     paddingValues = paddingValues,
                     productId = it.arguments?.getString("id") ?: "",
                     onNavBack = {
-                        navController.popBackStack()
-                        navController.navigate(Screen.HomeScreen.route)
+                        navController.navigateUp()
                     }
                 )
             }

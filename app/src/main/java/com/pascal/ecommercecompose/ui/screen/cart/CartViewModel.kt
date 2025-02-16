@@ -1,9 +1,11 @@
 package com.pascal.ecommercecompose.ui.screen.cart
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import com.pascal.ecommercecompose.data.local.repository.LocalRepository
 import com.pascal.ecommercecompose.data.repository.Repository
 import com.pascal.ecommercecompose.utils.Constant
+import com.pascal.ecommercecompose.utils.checkInternet
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -125,6 +127,21 @@ class CartViewModel(
         }
     }
 
+    suspend fun isOnline(context: Context): Boolean {
+        return withContext(Dispatchers.IO) {
+            checkInternet(context)
+        }
+    }
 
+    override fun onCleared() {
+        super.onCleared()
 
+        _uiState.update {
+            it.copy(
+                isLoading = false,
+                isError = false,
+                product = emptyList()
+            )
+        }
+    }
 }

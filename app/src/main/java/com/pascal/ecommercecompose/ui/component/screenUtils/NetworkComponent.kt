@@ -19,9 +19,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Color.Companion.Red
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.pascal.ecommercecompose.R
 import com.pascal.ecommercecompose.ui.screen.home.HomeViewModel
 import com.pascal.ecommercecompose.ui.theme.AppTheme
 import kotlinx.coroutines.delay
@@ -68,7 +70,7 @@ fun NetworkComponent(
         ) {
             Text(
                 modifier = modifier.fillMaxWidth(),
-                text = "Yeay, Your connection is online!",
+                text = stringResource(R.string.connection_online),
                 style = MaterialTheme.typography.titleSmall.copy(
                     color = Color.White
                 ),
@@ -88,7 +90,7 @@ fun NetworkComponent(
         ) {
             Text(
                 modifier = modifier.fillMaxWidth(),
-                text = "Ups, Your connection is offline!",
+                text = stringResource(R.string.connection_offline),
                 style = MaterialTheme.typography.titleSmall.copy(
                     color = Color.White
                 ),

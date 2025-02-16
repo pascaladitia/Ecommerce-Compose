@@ -15,7 +15,6 @@ import com.pascal.ecommercecompose.data.repository.Repository
 import com.pascal.ecommercecompose.utils.checkInternet
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.withContext
@@ -110,15 +109,6 @@ class HomeViewModel(
         }
     }
 
-    private suspend fun loadLocalProduct(): List<ProductEntity>? {
-        try {
-            return database.getAllProduct()
-        } catch (e: Exception) {
-            Log.e("Tag Local Product", e.message.toString())
-            return null
-        }
-    }
-
     private suspend fun saveLocalProduct(product: List<ProductEntity>?) {
         try {
             database.deleteProduct()
@@ -203,7 +193,6 @@ class HomeViewModel(
             it.copy(
                 isLoading = false,
                 isError = false,
-                product = emptyList()
             )
         }
     }

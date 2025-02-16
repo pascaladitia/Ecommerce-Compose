@@ -24,7 +24,7 @@ interface LocalRepositoryImpl {
     suspend fun deleteFavorite()
     suspend fun insertFavorite(item: FavoriteEntity)
 
-    suspend fun getProductById(id: Long): ProductEntity?
+    suspend fun getProductById(id: Int): ProductEntity?
     suspend fun getAllProduct(): List<ProductEntity>
     suspend fun deleteProductById(item: ProductEntity)
     suspend fun deleteProduct()

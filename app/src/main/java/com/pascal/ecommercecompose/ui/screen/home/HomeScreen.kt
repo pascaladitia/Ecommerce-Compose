@@ -98,7 +98,6 @@ fun HomeScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
-        viewModel.loadProducts(context)
         viewModel.loadCategory(context)
     }
 
@@ -135,7 +134,7 @@ fun HomeScreen(
                                 if (viewModel.isOnline(context)) {
                                     viewModel.loadProducts(context, it)
                                 } else {
-                                    showToast(context, "Your connection is Offline!")
+                                    showToast(context, context.getString(R.string.connection_offline))
                                 }
                             }
                         },

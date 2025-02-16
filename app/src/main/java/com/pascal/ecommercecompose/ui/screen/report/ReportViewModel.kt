@@ -82,7 +82,7 @@ class ReportViewModel(
             val drawable = ContextCompat.getDrawable(context, R.drawable.logo)
             val bitmap = (drawable as BitmapDrawable).bitmap
             val logoImage = Image(ImageDataFactory.create(bitmapToByteArray(bitmap)))
-                .setWidth(250f)
+                .setWidth(100f)
                 .setHeight(100f)
 
             val tableHeader = Table(floatArrayOf(1f, 3f))

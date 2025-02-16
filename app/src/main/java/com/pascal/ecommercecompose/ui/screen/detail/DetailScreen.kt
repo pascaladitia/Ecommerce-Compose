@@ -64,6 +64,7 @@ import com.pascal.ecommercecompose.data.local.entity.ProductEntity
 import com.pascal.ecommercecompose.domain.model.product.Review
 import com.pascal.ecommercecompose.ui.component.dialog.ShowDialog
 import com.pascal.ecommercecompose.ui.component.screenUtils.LoadingScreen
+import com.pascal.ecommercecompose.ui.component.screenUtils.NetworkComponent
 import com.pascal.ecommercecompose.ui.component.screenUtils.RatingBar
 import com.pascal.ecommercecompose.ui.component.screenUtils.TopAppBarWithBack
 import com.pascal.ecommercecompose.ui.theme.AppTheme
@@ -90,7 +91,7 @@ fun DetailScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
-        viewModel.loadProductsDetail(productId)
+        viewModel.loadProductsDetail(context, productId)
     }
 
     Surface(
@@ -109,24 +110,32 @@ fun DetailScreen(
             }
         }
 
-        DetailContent(
-            uiState = uiState,
-            uiEvent = DetailUIEvent(
-                onCart = {
-                    coroutine.launch {
-                        viewModel.getCart(context, it)
+        Box {
+            DetailContent(
+                uiState = uiState,
+                uiEvent = DetailUIEvent(
+                    onCart = {
+                        coroutine.launch {
+                            viewModel.getCart(context, it)
+                        }
+                    },
+                    onFavorite = { isFav, item ->
+                        coroutine.launch {
+                            viewModel.saveFavorite(isFav, item)
+                        }
+                    },
+                    onNavBack = {
+                        onNavBack()
                     }
-                },
-                onFavorite = { isFav, item ->
-                    coroutine.launch {
-                        viewModel.saveFavorite(isFav, item)
-                    }
-                },
-                onNavBack = {
-                    onNavBack()
-                }
+                )
             )
-        )
+
+            NetworkComponent(
+                modifier = Modifier.align(Alignment.BottomCenter),
+                isOnline = {},
+                isOffline = {}
+            )
+        }
     }
 }
 
@@ -229,7 +238,7 @@ fun DetailContent(
 
                             ProductReviews(product = uiState.product)
 
-                            Spacer(modifier = Modifier.padding(30.dp))
+                            Spacer(modifier = Modifier.padding(60.dp))
                         }
                     }
                 }

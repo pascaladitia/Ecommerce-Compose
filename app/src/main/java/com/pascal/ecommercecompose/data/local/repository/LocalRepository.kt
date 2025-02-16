@@ -72,7 +72,7 @@ class LocalRepository(
     }
 
     // Product
-    override suspend fun getProductById(id: Long): ProductEntity? {
+    override suspend fun getProductById(id: Int): ProductEntity? {
         return database.productDao().getProductById(id)
     }
 

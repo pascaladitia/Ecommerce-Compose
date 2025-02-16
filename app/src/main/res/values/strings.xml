@@ -18,4 +18,6 @@ stitched overlays and classic TPU details.
 Classic colours celebrate your fresh look
 while Max Air cushioning adds comfort to the journey.
     </string>
+    <string name="connection_offline">Ups, Your connection is offline!</string>
+    <string name="connection_online">Yeay, Your connection is online!</string>
 </resources>

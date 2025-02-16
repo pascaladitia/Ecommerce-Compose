@@ -67,6 +67,7 @@ import com.pascal.ecommercecompose.ui.theme.subTitleTextColor
 import com.pascal.ecommercecompose.ui.theme.titleTextColor
 import com.pascal.ecommercecompose.ui.theme.white
 import com.pascal.ecommercecompose.utils.calculateTotalPrice
+import com.pascal.ecommercecompose.utils.showToast
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
@@ -103,9 +104,13 @@ fun CartScreen(
                         }
                     },
                     onNext = {
-                        listProduct = it
                         coroutine.launch {
-                            snapUrl = viewModel.createSnapTransaction(calculateTotalPrice(it).toDouble())
+                            if (viewModel.isOnline(context)) {
+                                listProduct = it
+                                snapUrl = viewModel.createSnapTransaction(calculateTotalPrice(it).toDouble())
+                            } else {
+                                showToast(context, context.getString(R.string.connection_offline))
+                            }
                         }
                     }
                 )

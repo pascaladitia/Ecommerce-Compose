@@ -8,10 +8,13 @@ import com.pascal.ecommercecompose.data.local.entity.FavoriteEntity
 import com.pascal.ecommercecompose.data.local.repository.LocalRepository
 import com.pascal.ecommercecompose.data.repository.Repository
 import com.pascal.ecommercecompose.data.local.entity.ProductEntity
+import com.pascal.ecommercecompose.utils.checkInternet
 import com.pascal.ecommercecompose.utils.showToast
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.withContext
 
 class DetailViewModel(
     private val repository: Repository,
@@ -21,13 +24,19 @@ class DetailViewModel(
     private val _uiState = MutableStateFlow(DetailUIState())
     val uiState get() = _uiState.asStateFlow()
 
-    suspend fun loadProductsDetail(id: String?) {
+    suspend fun loadProductsDetail(context: Context, id: String?) {
         _uiState.update { it.copy(isLoading = true, product = null) }
 
         try {
             val favDb = loadFavorite(id)
-            val result = repository.getProductById(id?.toIntOrNull() ?: 0).apply {
-                isFavorite = favDb
+            val result = if (isOnline(context)) {
+                repository.getProductById(id?.toIntOrNull() ?: 0).apply {
+                    isFavorite = favDb
+                }
+            } else {
+                database.getProductById(id?.toIntOrNull() ?: 0)?.apply {
+                    isFavorite = favDb
+                }
             }
 
             _uiState.update {
@@ -110,7 +119,6 @@ class DetailViewModel(
     private suspend fun loadFavorite(id: String?): Boolean? {
         try {
             val result = database.getFavoriteById(id?.toLong() ?: 0)
-            Log.e("Tag result", result.toString())
             return result != null
         } catch (e: Exception) {
             Log.e("Tag Favorite", e.message.toString())
@@ -142,6 +150,12 @@ class DetailViewModel(
 
     fun setError(bool: Boolean) {
         _uiState.update { it.copy(isError = bool) }
+    }
+
+    private suspend fun isOnline(context: Context): Boolean {
+        return withContext(Dispatchers.IO) {
+            checkInternet(context)
+        }
     }
 
     override fun onCleared() {
