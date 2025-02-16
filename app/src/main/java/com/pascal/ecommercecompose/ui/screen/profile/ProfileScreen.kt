@@ -132,130 +132,137 @@ fun ProfileContent(
     uiState: ProfileUIState,
     uiEvent: ProfileUIEvent
 ) {
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(20.dp)
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically
+    Box {
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(20.dp)
         ) {
-            Box {
-                Image(
-                    modifier = Modifier
-                        .clip(CircleShape)
-                        .size(60.dp),
-                    contentDescription = null,
-                    painter = rememberAsyncImagePainter(
-                        ImageRequest.Builder(LocalContext.current)
-                            .data(data = pref?.photo_url?.toUri())
-                            .error(R.drawable.no_profile)
-                            .apply { crossfade(true) }
-                            .build()
-                    )
-                )
-
-                if (uiState.isVerified) {
-                    Icon(
-                        modifier = Modifier
-                            .align(Alignment.TopEnd)
-                            .size(24.dp),
-                        imageVector = Icons.Filled.CheckCircle,
-                        contentDescription = null,
-                        tint = Color.Green
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.width(12.dp))
-
-            Column {
-                Text(
-                    modifier = Modifier,
-                    text = pref?.name ?: "No Name",
-                    style = MaterialTheme.typography.headlineSmall.copy(
-                        fontSize = 20.sp,
-                    ),
-                    color = MaterialTheme.colorScheme.onSurface,
-                    textAlign = TextAlign.Center
-                )
-
-                Spacer(modifier = Modifier.height(6.dp))
-
-                Text(
-                    text = pref?.email ?: "No Email",
-                    style = MaterialTheme.typography.bodySmall.copy(
-                        fontSize = 16.sp,
-                    ),
-                    color = Color.Gray
-                )
-            }
-        }
-
-        if (!uiState.isVerified) {
-            Box(
-                modifier = modifier
-                    .padding(top = 24.dp)
-                    .border(1.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(16.dp))
-                    .clip(RoundedCornerShape(16.dp))
-                    .clickable { uiEvent.onVerified() }
-                    .padding(vertical = 10.dp, horizontal = 14.dp),
-                contentAlignment = Alignment.Center
+            Row(
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "No Verified",
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-
-                    Spacer(modifier = Modifier.width(10.dp))
-
-                    Icon(
-                        modifier = Modifier.size(24.dp),
-                        imageVector = Icons.Filled.Close,
+                Box {
+                    Image(
+                        modifier = Modifier
+                            .clip(CircleShape)
+                            .size(60.dp),
                         contentDescription = null,
-                        tint = Color.Red
+                        painter = rememberAsyncImagePainter(
+                            ImageRequest.Builder(LocalContext.current)
+                                .data(data = pref?.photo_url?.toUri())
+                                .error(R.drawable.no_profile)
+                                .apply { crossfade(true) }
+                                .build()
+                        )
+                    )
+
+                    if (uiState.isVerified) {
+                        Icon(
+                            modifier = Modifier
+                                .align(Alignment.TopEnd)
+                                .size(24.dp),
+                            imageVector = Icons.Filled.CheckCircle,
+                            contentDescription = null,
+                            tint = Color.Green
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.width(12.dp))
+
+                Column {
+                    Text(
+                        modifier = Modifier,
+                        text = pref?.name ?: "No Name",
+                        style = MaterialTheme.typography.headlineSmall.copy(
+                            fontSize = 20.sp,
+                        ),
+                        color = MaterialTheme.colorScheme.onSurface,
+                        textAlign = TextAlign.Center
+                    )
+
+                    Spacer(modifier = Modifier.height(6.dp))
+
+                    Text(
+                        text = pref?.email ?: "No Email",
+                        style = MaterialTheme.typography.bodySmall.copy(
+                            fontSize = 16.sp,
+                        ),
+                        color = Color.Gray
                     )
                 }
             }
-        }
 
-        Spacer(Modifier.height(20.dp))
-
-        Text(
-            buildAnnotatedString {
-                withStyle(style = ParagraphStyle(lineHeight = 30.sp)) {
-                    withStyle(
-                        style = SpanStyle(
-                            color = subTitleTextColor,
-                            fontSize = 24.sp
-                        )
+            if (!uiState.isVerified) {
+                Box(
+                    modifier = modifier
+                        .padding(top = 24.dp)
+                        .border(1.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(16.dp))
+                        .clip(RoundedCornerShape(16.dp))
+                        .clickable { uiEvent.onVerified() }
+                        .padding(vertical = 10.dp, horizontal = 14.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        append("History\n")
-                    }
-                    withStyle(
-                        style = SpanStyle(
-                            fontWeight = FontWeight.Bold,
-                            color = titleTextColor,
-                            fontSize = 24.sp
+                        Text(
+                            text = "No Verified",
+                            style = MaterialTheme.typography.bodyMedium
                         )
-                    ) {
-                        append("Transaction")
-                    }
 
+                        Spacer(modifier = Modifier.width(10.dp))
+
+                        Icon(
+                            modifier = Modifier.size(24.dp),
+                            imageVector = Icons.Filled.Close,
+                            contentDescription = null,
+                            tint = Color.Red
+                        )
+                    }
                 }
             }
-        )
 
-        Spacer(modifier = Modifier.padding(10.dp))
+            Spacer(Modifier.height(20.dp))
 
-        TransactionItemList(
-            uiState = uiState
-        )
+            Text(
+                buildAnnotatedString {
+                    withStyle(style = ParagraphStyle(lineHeight = 30.sp)) {
+                        withStyle(
+                            style = SpanStyle(
+                                color = subTitleTextColor,
+                                fontSize = 24.sp
+                            )
+                        ) {
+                            append("History\n")
+                        }
+                        withStyle(
+                            style = SpanStyle(
+                                fontWeight = FontWeight.Bold,
+                                color = titleTextColor,
+                                fontSize = 24.sp
+                            )
+                        ) {
+                            append("Transaction")
+                        }
 
-        ButtonComponent(text = "Logout") {
+                    }
+                }
+            )
+
+            Spacer(modifier = Modifier.padding(10.dp))
+
+            TransactionItemList(
+                uiState = uiState
+            )
+        }
+        ButtonComponent(
+            modifier = Modifier
+                .background(Color.White)
+                .padding(20.dp)
+                .align(Alignment.BottomCenter),
+            text = "Logout"
+        ) {
             uiEvent.onLogout()
         }
     }
@@ -268,8 +275,7 @@ fun TransactionItemList(
 ) {
     LazyColumn(
         modifier = modifier
-            .fillMaxWidth()
-            .height(500.dp),
+            .fillMaxSize(),
         contentPadding = PaddingValues(horizontal = 5.dp),
         verticalArrangement = Arrangement.spacedBy(40.dp)
     ) {
@@ -295,7 +301,7 @@ fun TransactionItemList(
                 isTotal = true
             )
 
-            HorizontalDivider(modifier = Modifier.padding(vertical = 16.dp))
+            HorizontalDivider(modifier = Modifier.padding(top = 16.dp))
         }
     }
 }
