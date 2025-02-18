@@ -371,7 +371,7 @@ fun ProductWidget(
                         Image(
                             modifier = Modifier
                                 .size(100.dp),
-                            contentScale = ContentScale.FillBounds,
+                            contentScale = ContentScale.Fit,
                             contentDescription = "",
                             painter = rememberAsyncImagePainter(
                                 ImageRequest.Builder(LocalContext.current)
