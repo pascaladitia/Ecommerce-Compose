@@ -37,13 +37,12 @@ jobs:
 
       # 6. Build all Release APKs (with signing)
       - name: Build Release APKs
-        run: ./gradlew \
-          :app:assembleRelease \
-          :favourite:assembleRelease \
-          -Pandroid.injected.signing.store.file=my-release-key.jks \
-          -Pandroid.injected.signing.store.password=${{ secrets.KEYSTORE_PASSWORD }} \
-          -Pandroid.injected.signing.key.alias=${{ secrets.KEY_ALIAS }} \
-          -Pandroid.injected.signing.key.password=${{ secrets.KEY_PASSWORD }}
+        run: |
+          ./gradlew :app:assembleRelease :favourite:assembleRelease \
+            -Pandroid.injected.signing.store.file=my-release-key.jks \
+            -Pandroid.injected.signing.store.password=${{ secrets.KEYSTORE_PASSWORD }} \
+            -Pandroid.injected.signing.key.alias=${{ secrets.KEY_ALIAS }} \
+            -Pandroid.injected.signing.key.password=${{ secrets.KEY_PASSWORD }}
 
       # 7. Upload Release APK artifact (v4)
       - name: Upload APK artifact
