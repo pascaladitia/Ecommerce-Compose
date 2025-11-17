@@ -18,79 +18,78 @@ android {
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
+
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        vectorDrawables {
+            useSupportLibrary = true
+        }
     }
 
-    signingConfigs {
-        create("release") {
-            storeFile = file("my-release-key.jks")
-            storePassword = System.getenv("KEYSTORE_PASSWORD")
-            keyAlias = System.getenv("KEY_ALIAS")
-            keyPassword = System.getenv("KEY_PASSWORD")
+    applicationVariants.all{
+        outputs.all {
+            if(name.contains("release"))
+                (this as com.android.build.gradle.internal.api.BaseVariantOutputImpl)
+                    .outputFileName = "app-$name-$versionName.apk"
+        }
+    }
+
+    flavorDimensions += "environment"
+    var baseUrl : String
+    var apiKey : String
+
+    productFlavors {
+        create("dev") {
+            baseUrl = "https://dummyjson.com"
+            apiKey = "api-key"
+            dimension = "environment"
+            buildConfigField("String", "API_KEY", "\"" + apiKey + "\"")
+            buildConfigField("String", "BASE_URL", "\"" + baseUrl + "\"")
+        }
+
+        create("staging") {
+            baseUrl = "https://dummyjson.com"
+            apiKey = "api-key"
+            dimension = "environment"
+            buildConfigField("String", "API_KEY", "\"" + apiKey + "\"")
+            buildConfigField("String", "BASE_URL", "\"" + baseUrl + "\"")
+        }
+
+        create("prod") {
+            baseUrl = "https://dummyjson.com"
+            apiKey = "api-key"
+            dimension = "environment"
+            buildConfigField("String", "API_KEY", "\"" + apiKey + "\"")
+            buildConfigField("String", "BASE_URL", "\"" + baseUrl + "\"")
         }
     }
 
     buildTypes {
         release {
             isMinifyEnabled = false
-            signingConfig = signingConfigs.getByName("release")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
         }
     }
-
-    flavorDimensions += "environment"
-    var baseUrl: String
-    var apiKey: String
-
-    productFlavors {
-        create("dev") {
-            dimension = "environment"
-            baseUrl = "https://dummyjson.com"
-            apiKey = "api-key"
-            buildConfigField("String", "API_KEY", "\"$apiKey\"")
-            buildConfigField("String", "BASE_URL", "\"$baseUrl\"")
-            signingConfig = signingConfigs.getByName("release")
-        }
-
-        create("staging") {
-            dimension = "environment"
-            baseUrl = "https://dummyjson.com"
-            apiKey = "api-key"
-            buildConfigField("String", "API_KEY", "\"$apiKey\"")
-            buildConfigField("String", "BASE_URL", "\"$baseUrl\"")
-            signingConfig = signingConfigs.getByName("release")
-        }
-
-        create("prod") {
-            dimension = "environment"
-            baseUrl = "https://dummyjson.com"
-            apiKey = "api-key"
-            buildConfigField("String", "API_KEY", "\"$apiKey\"")
-            buildConfigField("String", "BASE_URL", "\"$baseUrl\"")
-            signingConfig = signingConfigs.getByName("release")
-        }
-    }
-
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
-    kotlinOptions { jvmTarget = "1.8" }
-
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
     buildFeatures {
         compose = true
         buildConfig = true
     }
-
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.1"
     }
-
     packaging {
-        resources.excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        resources {
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
     }
 }
 
