@@ -29,7 +29,9 @@ jobs:
 
       # 4. Decode Keystore
       - name: Decode keystore
-        run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > my-release-key.jks
+        run: |
+          mkdir -p app
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > app/my-release-key.jks
 
       # 5. Run Unit Tests (before building release)
       - name: Run Unit Tests
@@ -39,7 +41,7 @@ jobs:
       - name: Build Release APKs
         run: |
           ./gradlew :app:assembleRelease \
-            -Pandroid.injected.signing.store.file=my-release-key.jks \
+            -Pandroid.injected.signing.store.file=app/my-release-key.jks \
             -Pandroid.injected.signing.store.password=${{ secrets.KEYSTORE_PASSWORD }} \
             -Pandroid.injected.signing.key.alias=${{ secrets.KEY_ALIAS }} \
             -Pandroid.injected.signing.key.password=${{ secrets.KEY_PASSWORD }}
@@ -49,5 +51,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: release-apk
-          path: |
-            app/build/outputs/apk/release/*.apk
+          path: app/build/outputs/apk/release/*.apk
