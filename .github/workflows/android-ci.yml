@@ -38,7 +38,7 @@ jobs:
       # 6. Build all Release APKs (with signing)
       - name: Build Release APKs
         run: |
-          ./gradlew :app:assembleRelease :favourite:assembleRelease \
+          ./gradlew :app:assembleRelease \
             -Pandroid.injected.signing.store.file=my-release-key.jks \
             -Pandroid.injected.signing.store.password=${{ secrets.KEYSTORE_PASSWORD }} \
             -Pandroid.injected.signing.key.alias=${{ secrets.KEY_ALIAS }} \
