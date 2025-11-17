@@ -32,6 +32,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.pascal.ecommercecompose.ui.theme.AppTheme
+import com.pascal.ecommercecompose.ui.theme.lightbox
 import compose.icons.FeatherIcons
 import compose.icons.feathericons.Search
 
@@ -49,14 +50,13 @@ fun Search(
     BasicTextField(
         modifier = modifier
             .heightIn(min = 40.dp)
-            .border(1.dp, border, RoundedCornerShape(8.dp))
-            .background(Color.White, RoundedCornerShape(8.dp)),
+            .background(lightbox, RoundedCornerShape(8.dp)),
 
         value = searchText,
         onValueChange = {
             searchText = it
         },
-        textStyle = MaterialTheme.typography.bodySmall,
+        textStyle = MaterialTheme.typography.bodyMedium,
         singleLine = true,
         keyboardOptions = KeyboardOptions.Default.copy(
             imeAction = ImeAction.Search,
@@ -79,7 +79,7 @@ fun Search(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Icon(
-                        modifier = Modifier.size(16.dp),
+                        modifier = Modifier.size(24.dp),
                         imageVector = FeatherIcons.Search,
                         contentDescription = "Search",
                         tint = MaterialTheme.colorScheme.onSurface
@@ -90,8 +90,8 @@ fun Search(
                     Box {
                         if (searchText.isEmpty()) {
                             Text(
-                                text = "Cari Tugas Disini",
-                                style = MaterialTheme.typography.bodySmall.copy(
+                                text = "Search Products",
+                                style = MaterialTheme.typography.bodyMedium.copy(
                                     color = MaterialTheme.colorScheme.onSurface
                                 )
                             )

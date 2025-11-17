@@ -3,20 +3,32 @@ package com.pascal.ecommercecompose.ui.navigation
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalContext
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.pascal.ecommercecompose.data.prefs.PreferencesLogin
+import com.pascal.ecommercecompose.ui.screen.cart.CartScreen
+import com.pascal.ecommercecompose.ui.screen.detail.DetailScreen
+import com.pascal.ecommercecompose.ui.screen.favorite.FavoriteScreen
 import com.pascal.ecommercecompose.ui.screen.home.HomeScreen
-import com.pascal.ecommercecompose.ui.screen.live.LiveScreen
+import com.pascal.ecommercecompose.ui.screen.login.LoginScreen
 import com.pascal.ecommercecompose.ui.screen.profile.ProfileScreen
+import com.pascal.ecommercecompose.ui.screen.register.RegisterScreen
+import com.pascal.ecommercecompose.ui.screen.report.ReportScreen
 import com.pascal.ecommercecompose.ui.screen.splash.SplashScreen
+import com.pascal.ecommercecompose.ui.screen.verified.VerifiedScreen
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 @Composable
 fun RouteScreen(
     navController: NavHostController = rememberNavController(),
 ) {
+    val context = LocalContext.current
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
@@ -24,7 +36,8 @@ fun RouteScreen(
         bottomBar = {
             if (currentRoute in listOf(
                     Screen.HomeScreen.route,
-                    Screen.LiveScreen.route,
+                    Screen.FavoriteScreen.route,
+                    Screen.CartScreen.route,
                     Screen.ProfileScreen.route
                 )) {
                 BottomBar(navController)
@@ -39,7 +52,11 @@ fun RouteScreen(
                 SplashScreen(
                     paddingValues = paddingValues
                 ) {
-                    navController.navigate( Screen.HomeScreen.route) {
+                    val isLogin = PreferencesLogin.getIsLogin(context)
+
+                    navController.navigate(
+                        if (isLogin) Screen.HomeScreen.route else Screen.LoginScreen.route
+                    ) {
                         popUpTo(Screen.SplashScreen.route) {
                             inclusive = true
                         }
@@ -47,30 +64,118 @@ fun RouteScreen(
                     }
                 }
             }
-            composable(route = Screen.HomeScreen.route) {
-                HomeScreen(
+            composable(route = Screen.LoginScreen.route) {
+                LoginScreen(
                     paddingValues = paddingValues,
-                    onDetail = {
+                    onLogin = {
+                        navController.navigate(Screen.HomeScreen.route) {
+                            popUpTo(Screen.LoginScreen.route) {
+                                inclusive = true
+                            }
+                            launchSingleTop = true
+                        }
+                    },
+                    onRegister = {
+                        navController.navigate(Screen.RegisterScreen.route)
+                    }
+                )
+            }
+            composable(route = Screen.RegisterScreen.route) {
+                RegisterScreen(
+                    paddingValues = paddingValues,
+                    onNavBack = {
                         navController.popBackStack()
                     }
                 )
             }
-            composable(route = Screen.LiveScreen.route) {
-                LiveScreen(
+            composable(route = Screen.HomeScreen.route) {
+                HomeScreen(
                     paddingValues = paddingValues,
                     onDetail = {
-                        navController.popBackStack()
+                        navController.navigate(Screen.DetailScreen.createRoute(it ?: ""))
+                    }
+                )
+            }
+            composable(route = Screen.CartScreen.route) {
+                CartScreen(
+                    paddingValues = paddingValues,
+                    onFinish = {
+                        saveToCurrentBackStack(navController, "cart", it)
+                        navController.navigate(Screen.ReportScreen.route)
+                    }
+                )
+            }
+            composable(route = Screen.FavoriteScreen.route) {
+                FavoriteScreen (
+                    paddingValues = paddingValues,
+                    onDetail = {
+                        navController.navigate(Screen.DetailScreen.createRoute(it?.id.toString()))
                     }
                 )
             }
             composable(route = Screen.ProfileScreen.route) {
                 ProfileScreen(
                     paddingValues = paddingValues,
-                    onDetail = {
+                    onVerified = {
+                        navController.navigate(Screen.VerifiedScreen.route)
+                    },
+                    onLogout = {
                         navController.popBackStack()
+                        navController.navigate(Screen.LoginScreen.route) {
+                            popUpTo(Screen.HomeScreen.route) {
+                                inclusive = true
+                            }
+                            launchSingleTop = true
+                        }
+                    }
+                )
+            }
+            composable(route = Screen.DetailScreen.route) {
+                DetailScreen(
+                    paddingValues = paddingValues,
+                    productId = it.arguments?.getString("id") ?: "",
+                    onNavBack = {
+                        navController.navigateUp()
+                    }
+                )
+            }
+            composable(route = Screen.ReportScreen.route) {
+                ReportScreen(
+                    paddingValues = paddingValues,
+                    product = getFromPreviousBackStack(navController, "cart"),
+                    onNavBack = {
+                        navController.popBackStack()
+                        navController.navigate(Screen.HomeScreen.route)
+                    }
+                )
+            }
+            composable(route = Screen.VerifiedScreen.route) {
+                VerifiedScreen(
+                    onNavBack = {
+                        navController.popBackStack()
+                        navController.navigate(Screen.ProfileScreen.route)
                     }
                 )
             }
         }
     }
 }
+
+inline fun <reified T> saveToCurrentBackStack(
+    navController: NavController,
+    key: String,
+    data: T
+) {
+    val json = Json.encodeToString(data)
+    navController.currentBackStackEntry?.savedStateHandle?.set(key, json)
+}
+
+inline fun <reified T> getFromPreviousBackStack(
+    navController: NavController,
+    key: String
+): T? {
+    val json = navController.previousBackStackEntry?.savedStateHandle?.get<String>(key)
+    return json?.let { Json.decodeFromString(it) }
+}
+
+

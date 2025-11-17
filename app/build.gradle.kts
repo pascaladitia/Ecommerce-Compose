@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.room)
     alias(libs.plugins.ksp)
     alias(libs.plugins.kotlinx.serialization)
+    alias(libs.plugins.google.gms.google.services)
 }
 
 android {
@@ -38,7 +39,7 @@ android {
 
     productFlavors {
         create("dev") {
-            baseUrl = "sample_url"
+            baseUrl = "https://dummyjson.com"
             apiKey = "api-key"
             dimension = "environment"
             buildConfigField("String", "API_KEY", "\"" + apiKey + "\"")
@@ -46,7 +47,7 @@ android {
         }
 
         create("staging") {
-            baseUrl = "sample_url"
+            baseUrl = "https://dummyjson.com"
             apiKey = "api-key"
             dimension = "environment"
             buildConfigField("String", "API_KEY", "\"" + apiKey + "\"")
@@ -54,7 +55,7 @@ android {
         }
 
         create("prod") {
-            baseUrl = "sample_url"
+            baseUrl = "https://dummyjson.com"
             apiKey = "api-key"
             dimension = "environment"
             buildConfigField("String", "API_KEY", "\"" + apiKey + "\"")
@@ -125,7 +126,6 @@ dependencies {
     implementation(libs.coil.gif)
     implementation(libs.accompanist.flowlayout)
     implementation(libs.accompanist.permissions)
-    implementation(libs.accompanist.swiperefresh)
     implementation(libs.accompanist.pager)
     implementation(libs.feather.icons)
 
@@ -155,7 +155,18 @@ dependencies {
     implementation(libs.room.runtime.android)
     ksp(libs.room.compiler)
 
-    // Chucker
-    releaseImplementation(libs.chuckerReleaseNoOp)
-    debugImplementation(libs.chuckerDebug)
+    // Firebase
+    implementation(libs.firebase.auth)
+    implementation(libs.firebase.firestore)
+    implementation(libs.play.services.auth)
+    implementation(libs.face.detection)
+
+    // Camera
+    implementation(libs.androidx.camera.camera2)
+    implementation(libs.androidx.camera.lifecycle)
+    implementation(libs.androidx.camera.view)
+    implementation(libs.guava)
+
+    // PDF
+    implementation(libs.itext7.core)
 }

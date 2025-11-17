@@ -10,4 +10,8 @@ object Constant {
     const val ERROR_LOGIN = "Incorrect email or password!"
     const val BEARER = "Bearer "
     const val FORMAT_DATE = "yyyy-MM-dd"
+
+    const val USD_URL = "https://api.exchangerate-api.com/v4/latest/USD"
+    const val MIDTRANS_SERVER = ""
+    const val CLIENT_ID = ""
 }

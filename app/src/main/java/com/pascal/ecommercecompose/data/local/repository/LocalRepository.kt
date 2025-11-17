@@ -1,6 +1,9 @@
 package com.pascal.ecommercecompose.data.local.repository
 
 import com.pascal.ecommercecompose.data.local.database.AppDatabase
+import com.pascal.ecommercecompose.data.local.entity.CartEntity
+import com.pascal.ecommercecompose.data.local.entity.FavoriteEntity
+import com.pascal.ecommercecompose.data.local.entity.ProductEntity
 import com.pascal.ecommercecompose.data.local.entity.ProfileEntity
 import org.koin.core.annotation.Single
 
@@ -9,6 +12,7 @@ class LocalRepository(
     private val database: AppDatabase,
 ) : LocalRepositoryImpl {
 
+    // Profile
     override suspend fun getProfileById(id: Long): ProfileEntity? {
         return database.profileDao().getProfileById(id)
     }
@@ -24,4 +28,68 @@ class LocalRepository(
     override suspend fun insertProfile(item: ProfileEntity) {
         return database.profileDao().insertProfile(item)
     }
+
+    // Cart
+    override suspend fun getCartById(id: Long): CartEntity? {
+        return database.cartDao().getCartById(id)
+    }
+
+    override suspend fun getAllCart(): List<CartEntity> {
+        return database.cartDao().getAllCart()
+    }
+
+    override suspend fun deleteCartById(item: CartEntity) {
+        return database.cartDao().deleteCart(item)
+    }
+
+    override suspend fun deleteCart() {
+        return database.cartDao().clearCart()
+    }
+
+    override suspend fun insertCart(item: CartEntity) {
+        return database.cartDao().insertCart(item)
+    }
+
+    // Favorite
+    override suspend fun getFavoriteById(id: Long): FavoriteEntity? {
+        return database.favoriteDao().getFavoriteById(id)
+    }
+
+    override suspend fun getAllFavorite(): List<FavoriteEntity> {
+        return database.favoriteDao().getAllFavorites()
+    }
+
+    override suspend fun deleteFavoriteById(item: FavoriteEntity) {
+        return database.favoriteDao().deleteFavorite(item)
+    }
+
+    override suspend fun deleteFavorite() {
+        return database.favoriteDao().clearFavorite()
+    }
+
+    override suspend fun insertFavorite(item: FavoriteEntity) {
+        return database.favoriteDao().insertFavorite(item)
+    }
+
+    // Product
+    override suspend fun getProductById(id: Int): ProductEntity? {
+        return database.productDao().getProductById(id)
+    }
+
+    override suspend fun getAllProduct(): List<ProductEntity> {
+        return database.productDao().getAllProducts()
+    }
+
+    override suspend fun deleteProductById(item: ProductEntity) {
+        return database.productDao().deleteProduct(item)
+    }
+
+    override suspend fun deleteProduct() {
+        return database.productDao().clearProduct()
+    }
+
+    override suspend fun insertProduct(item: ProductEntity) {
+        return database.productDao().insertProduct(item)
+    }
+    
 }
