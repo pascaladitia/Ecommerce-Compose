@@ -30,25 +30,20 @@ jobs:
       # 4. Decode Keystore
       - name: Decode keystore
         run: |
-          mkdir -p app
-          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > app/my-release-key.jks
+          cd app
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > my-release-key.jks
 
       # 5. Run Unit Tests (before building release)
       - name: Run Unit Tests
         run: ./gradlew test
 
-      # 6. Build all Release APKs (with signing)
-      - name: Build Release APKs
-        run: |
-          ./gradlew :app:assembleRelease \
-            -Pandroid.injected.signing.store.file=app/my-release-key.jks \
-            -Pandroid.injected.signing.store.password=${{ secrets.KEYSTORE_PASSWORD }} \
-            -Pandroid.injected.signing.key.alias=${{ secrets.KEY_ALIAS }} \
-            -Pandroid.injected.signing.key.password=${{ secrets.KEY_PASSWORD }}
+      # 6. Build APK (prodRelease)
+      - name: Build prodRelease APK
+        run: ./gradlew :app:assembleProdRelease
 
       # 7. Upload Release APK artifact (v4)
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: release-apk
-          path: app/build/outputs/apk/release/*.apk
+          name: prod-release-apk
+          path: app/build/outputs/apk/prod/release/*.apk
