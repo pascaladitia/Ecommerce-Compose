@@ -33,7 +33,7 @@ jobs:
 
       # 5. Run Unit Tests (before building release)
       - name: Run Unit Tests
-        run: ./gradlew testDebugUnitTest
+        run: ./gradlew test
 
       # 6. Build all Release APKs (with signing)
       - name: Build Release APKs
