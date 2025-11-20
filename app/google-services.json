@@ -8,17 +8,17 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:556845723199:android:50179cd9b8135d58ab128a",
+        "mobilesdk_app_id": "1:556845723199:android:5493a8ccead5017eab128a",
         "android_client_info": {
-          "package_name": "com.pascal.ecommercecompose"
+          "package_name": "com.pascal.ecommerce.androidApp"
         }
       },
       "oauth_client": [
         {
-          "client_id": "556845723199-lnsig6p6r31cu6agrvr5s7kn0ue10ho4.apps.googleusercontent.com",
+          "client_id": "556845723199-cubpa6a9ba2gl7g0ebdng4n0s91srsv3.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.pascal.ecommercecompose",
+            "package_name": "com.pascal.ecommerce.androidApp",
             "certificate_hash": "94d3f9bee847786a80cb6c4315fdec5aba38b0ad"
           }
         },
@@ -38,6 +38,101 @@
             {
               "client_id": "556845723199-1blna8ger265a578hccuvte5j9nv8q16.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "556845723199-4lht0oq2hjj19sbjk6injv113pqtobvp.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "org.pascal.ecommerce"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:556845723199:android:3476693bd9b747c9ab128a",
+        "android_client_info": {
+          "package_name": "com.pascal.ecommercecompose"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "556845723199-lv1clppaeg32qopvvknfoakenhmicjfn.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.pascal.ecommercecompose",
+            "certificate_hash": "909133d99f4153ed7335b07730508295ce017abb"
+          }
+        },
+        {
+          "client_id": "556845723199-1blna8ger265a578hccuvte5j9nv8q16.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBghHp2MewwZ_76xgqWBS7pNr6amon_LWw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "556845723199-1blna8ger265a578hccuvte5j9nv8q16.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "556845723199-4lht0oq2hjj19sbjk6injv113pqtobvp.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "org.pascal.ecommerce"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:556845723199:android:7382bb124a21f524ab128a",
+        "android_client_info": {
+          "package_name": "org.pascal.ecommerce"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "556845723199-qr2fphdkda296b1ujj2pmqttjskqptgv.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "org.pascal.ecommerce",
+            "certificate_hash": "909133d99f4153ed7335b07730508295ce017abb"
+          }
+        },
+        {
+          "client_id": "556845723199-1blna8ger265a578hccuvte5j9nv8q16.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBghHp2MewwZ_76xgqWBS7pNr6amon_LWw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "556845723199-1blna8ger265a578hccuvte5j9nv8q16.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "556845723199-4lht0oq2hjj19sbjk6injv113pqtobvp.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "org.pascal.ecommerce"
+              }
             }
           ]
         }
