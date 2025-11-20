@@ -76,14 +76,14 @@ jobs:
 
       # 11. Upload to Firebase Distribution
       - name: Upload to Firebase Distribution
-        # TOKEN MANDATORY!
         env:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+          FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
+          CI: true
         run: |
           firebase appdistribution:distribute ${{ env.APK_PATH }} \
-            --app ${{ secrets.FIREBASE_APP_ID }} \
+            --app "$FIREBASE_APP_ID" \
             --token "$FIREBASE_TOKEN" \
-            --release-notes "Auto build from CI/CD (merge development → master)" \
+            --release-notes "Auto build from CI/CD (merge development -> master)" \
             --testers "pascaladitia@gmail.com" \
-            --project my-ecommerce-8405d \
-            --ci
+            --project my-ecommerce-8405d
