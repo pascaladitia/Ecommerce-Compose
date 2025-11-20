@@ -59,11 +59,17 @@ jobs:
       - name: Install Firebase CLI
         run: npm install -g firebase-tools
 
-      # 10. Upload to Firebase App Distribution
+      # 10. Debug Firebase Token
+      - name: Check Firebase Token
+        run: echo ${{ secrets.FIREBASE_TOKEN }}
+
+      # 11. Upload to Firebase App Distribution
       - name: Upload to Firebase Distribution
         run: |
           firebase appdistribution:distribute ${{ env.APK_PATH }} \
             --app ${{ secrets.FIREBASE_APP_ID }} \
             --token ${{ secrets.FIREBASE_TOKEN }} \
             --release-notes "Auto build from CI/CD (merge develop -> master)" \
-            --testers "pascaladitia@gmail.com"
+            --testers "pascaladitia@gmail.com" \
+            --project your_project_id \
+            --ci
