@@ -43,22 +43,27 @@ jobs:
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: ./gradlew :app:assembleProdRelease
 
-      # 7. Upload APK to GitHub as an artifact (optional)
+      # 7. Find APK filename dynamically (matches Gradle output)
+      - name: Find APK filename
+        id: apk
+        run: echo "APK_PATH=$(ls app/build/outputs/apk/prod/release/app-*.apk)" >> $GITHUB_ENV
+
+      # 8. Upload APK to GitHub as an artifact (optional)
       - name: Upload APK to GitHub
         uses: actions/upload-artifact@v4
         with:
-          name: prod-release-apk
-          path: app/build/outputs/apk/prod/release/*.apk
+          name: APK-${{ github.sha }}
+          path: ${{ env.APK_PATH }}
 
-      # 8. Install Firebase CLI
+      # 9. Install Firebase CLI
       - name: Install Firebase CLI
         run: npm install -g firebase-tools
 
-      # 9. Upload APK to Firebase App Distribution
+      # 10. Upload to Firebase App Distribution
       - name: Upload to Firebase Distribution
         run: |
-          firebase appdistribution:distribute app/build/outputs/apk/prod/release/*.apk \
+          firebase appdistribution:distribute ${{ env.APK_PATH }} \
             --app ${{ secrets.FIREBASE_APP_ID }} \
             --token ${{ secrets.FIREBASE_TOKEN }} \
             --release-notes "Auto build from CI/CD (merge develop -> master)" \
-            --testers "email@tester.com"  # You can use testerGroup instead of individual emails
+            --testers "pascaladitia@gmail.com"
